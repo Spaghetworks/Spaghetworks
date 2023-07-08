@@ -1,0 +1,16 @@
+{
+	"name":"block_cube",
+	"display_name":"Basic Cube",
+	"category":"Generic Blocks",
+	"mass":1,
+	"visual_mesh":
+	{
+		"name":"generator_cuboid",
+		"dimensions":[1,1,1]
+	},
+	"collision_mesh":
+	{
+		"name":"generator_cuboid",
+		"dimensions":[1,1,1]
+	}
+}

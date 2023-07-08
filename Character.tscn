@@ -1,0 +1,38 @@
+[gd_scene load_steps=4 format=3 uid="uid://dc22xe8nqjrxt"]
+
+[ext_resource type="Script" path="res://CharacterController.gd" id="1_b7ton"]
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_cuyvo"]
+radius = 0.4
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_mqr8u"]
+radius = 0.3
+
+[node name="CharacterOrigin" type="CharacterBody3D"]
+script = ExtResource("1_b7ton")
+
+[node name="BodyShape" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.4, 0)
+shape = SubResource("SphereShape3D_cuyvo")
+
+[node name="HeadShape" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.35, 0)
+shape = SubResource("SphereShape3D_cuyvo")
+
+[node name="Camera3D" type="Camera3D" parent="HeadShape"]
+
+[node name="HeadDriver" type="RigidBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.45, 0)
+mass = 0.1
+can_sleep = false
+linear_damp = 0.01
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="HeadDriver"]
+shape = SubResource("SphereShape3D_mqr8u")
+
+[node name="SliderJoint3D" type="SliderJoint3D" parent="."]
+transform = Transform3D(-4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0, 0, 1, 0, 0.85, 0)
+node_a = NodePath("..")
+node_b = NodePath("../HeadDriver")
+linear_limit/upper_distance = 0.6
+linear_limit/lower_distance = -0.35

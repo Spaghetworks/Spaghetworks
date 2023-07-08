@@ -1,0 +1,41 @@
+[gd_scene load_steps=8 format=3 uid="uid://cce1d3rlkl60v"]
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_hii0h"]
+size = Vector2(20, 20)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_qwr6g"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_c3it8"]
+
+[sub_resource type="SphereMesh" id="SphereMesh_xwxpm"]
+
+[sub_resource type="PhysicalSkyMaterial" id="PhysicalSkyMaterial_try2w"]
+
+[sub_resource type="Sky" id="Sky_sc74o"]
+sky_material = SubResource("PhysicalSkyMaterial_try2w")
+
+[sub_resource type="Environment" id="Environment_nkvvk"]
+background_mode = 1
+background_color = Color(0.819608, 0.819608, 0.921569, 1)
+sky = SubResource("Sky_sc74o")
+ambient_light_source = 3
+
+[node name="EditorEnvironment" type="Node3D"]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+mesh = SubResource("PlaneMesh_hii0h")
+surface_material_override/0 = SubResource("StandardMaterial3D_qwr6g")
+
+[node name="MeshInstance3D2" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, -5)
+mesh = SubResource("BoxMesh_c3it8")
+
+[node name="MeshInstance3D3" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.47103, 0.499998, 3.95575)
+mesh = SubResource("SphereMesh_xwxpm")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_nkvvk")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.0638704, 0.997958, 0, -0.997958, 0.0638704, 0, 4.94966, 0)

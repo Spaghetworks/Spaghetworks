@@ -1,0 +1,16 @@
+{
+	"name":"block_cube_big",
+	"display_name":"Big Cube",
+	"category":"Generic Blocks",
+	"mass":125,
+	"visual_mesh":
+	{
+		"name":"generator_cuboid",
+		"dimensions":[5,5,5]
+	},
+	"collision_mesh":
+	{
+		"name":"generator_cuboid",
+		"dimensions":[5,5,5]
+	}
+}

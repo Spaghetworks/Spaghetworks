@@ -1,0 +1,68 @@
+[gd_scene load_steps=4 format=3 uid="uid://bl5igur7y2g8s"]
+
+[ext_resource type="Script" path="res://EditorUI.gd" id="1_avofj"]
+[ext_resource type="Script" path="res://Palette.gd" id="2_r11f3"]
+[ext_resource type="Script" path="res://StatMonitor.gd" id="3_bua5r"]
+
+[node name="EditorUI" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1_avofj")
+
+[node name="Button" type="Button" parent="."]
+layout_mode = 0
+offset_right = 8.0
+offset_bottom = 8.0
+text = "Restart Editor"
+
+[node name="Button2" type="Button" parent="."]
+layout_mode = 0
+offset_left = 121.0
+offset_right = 204.0
+offset_bottom = 31.0
+text = "Go to Sim"
+
+[node name="TabContainer" type="TabContainer" parent="."]
+layout_mode = 0
+offset_top = 1297.0
+offset_right = 637.0
+offset_bottom = 1369.0
+script = ExtResource("2_r11f3")
+
+[node name="Panel" type="Panel" parent="."]
+visible = false
+layout_mode = 0
+offset_top = 455.0
+offset_right = 150.0
+offset_bottom = 543.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Panel"]
+layout_mode = 0
+offset_right = 1.0
+offset_bottom = 77.0
+
+[node name="StatRes" type="Label" parent="Panel/VBoxContainer"]
+layout_mode = 2
+script = ExtResource("3_bua5r")
+base_string = "Residential: "
+stat_name = "blockcount_residential"
+
+[node name="StatCom" type="Label" parent="Panel/VBoxContainer"]
+layout_mode = 2
+script = ExtResource("3_bua5r")
+base_string = "Commercial: "
+stat_name = "blockcount_commercial"
+
+[node name="StatInd" type="Label" parent="Panel/VBoxContainer"]
+layout_mode = 2
+script = ExtResource("3_bua5r")
+base_string = "Industrial: "
+stat_name = "blockcount_industrial"
+
+[connection signal="pressed" from="Button" to="." method="_on_reload_pressed"]
+[connection signal="pressed" from="Button2" to="." method="_on_to_sim_pressed"]

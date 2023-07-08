@@ -1,0 +1,27 @@
+[gd_scene load_steps=7 format=3 uid="uid://cd2m7m3p31lsu"]
+
+[ext_resource type="Script" path="res://Simulation.gd" id="1_88bwx"]
+[ext_resource type="PackedScene" uid="uid://bok2xg5rroygo" path="res://TestMap.tscn" id="1_tg51h"]
+[ext_resource type="PackedScene" uid="uid://dc22xe8nqjrxt" path="res://Character.tscn" id="2_l00u2"]
+
+[sub_resource type="PhysicalSkyMaterial" id="PhysicalSkyMaterial_qexaa"]
+
+[sub_resource type="Sky" id="Sky_dxc5m"]
+sky_material = SubResource("PhysicalSkyMaterial_qexaa")
+
+[sub_resource type="Environment" id="Environment_1bxdo"]
+background_mode = 1
+background_color = Color(0.819608, 0.819608, 0.921569, 1)
+sky = SubResource("Sky_dxc5m")
+ambient_light_source = 3
+
+[node name="World" type="Node3D"]
+script = ExtResource("1_88bwx")
+
+[node name="MeshInstance3D" parent="." instance=ExtResource("1_tg51h")]
+
+[node name="CharacterOrigin" parent="." instance=ExtResource("2_l00u2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16.2192, 3.62452, 0.424957)
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_1bxdo")
