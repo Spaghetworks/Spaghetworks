@@ -37,6 +37,7 @@ static func to_world(proto_construct):
 		)
 	construct.set_center_of_mass_mode(RigidBody3D.CENTER_OF_MASS_MODE_CUSTOM)
 	construct.set_center_of_mass(com)
+	construct.set_mass(mass)
 	construct.set_inertia(moment)
 	proto_construct.queue_free()
 	
