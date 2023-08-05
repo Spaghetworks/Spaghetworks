@@ -16,7 +16,7 @@ func _ready():
 	var dir = dirs.pop_front()
 
 	while dir != null:
-		blocks_dir.change_dir(dir)
+		blocks_dir.change_dir(dir) 
 		print(dir)
 		# Search first directory in list
 		for file in blocks_dir.get_files():

@@ -3,7 +3,7 @@ extends Node
 enum scenes {SCENE_NONE, SCENE_MENU, SCENE_EDITOR, SCENE_SIMULATION}
 
 var scene_editor = preload("res://EditorSystem/Editor.tscn")
-var scene_simulation = preload("res://Simulation.tscn")
+var scene_simulation = preload("res://SimulationSystem/Simulation.tscn")
 
 var active_scene = scenes.SCENE_NONE
 #var deferred_scene = scenes.SCENE_NONE
