@@ -1,6 +1,6 @@
 [gd_scene load_steps=8 format=3 uid="uid://dc22xe8nqjrxt"]
 
-[ext_resource type="Script" path="res://CharacterController.gd" id="1_b7ton"]
+[ext_resource type="Script" path="res://CharacterSystem/CharacterController.gd" id="1_b7ton"]
 [ext_resource type="Texture2D" uid="uid://dwj2g6eq8023n" path="res://OrthoCross.png" id="2_0rt46"]
 [ext_resource type="Script" path="res://Toolbelt.gd" id="2_ewbx6"]
 [ext_resource type="PackedScene" uid="uid://brv5gql2tf83r" path="res://Impulse_Tool.tscn" id="3_2xrat"]

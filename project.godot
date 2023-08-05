@@ -17,9 +17,9 @@ config/icon="res://icon.svg"
 
 [autoload]
 
-BlockLoader="*res://BlockLoader.gd"
+BlockLoader="*res://BlockSystem/BlockLoader.gd"
 CursorGlobals="*res://CursorGlobals.gd"
-BlockStatistics="*res://BlockStatistics.gd"
+BlockStatistics="*res://BlockSystem/BlockStatistics.gd"
 ConstructTranslator="*res://ConstructTranslator.gd"
 
 [display]
