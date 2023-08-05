@@ -2,13 +2,14 @@ extends Node
 
 # Loads and assembles a block from a config file.
 
+var systemBaseDirectory = "res://BlockSystem"
 var blocks = {}
 var loaded = false
 signal block_registered
 
 func _ready():
 	print("Begin loading")
-	var blocks_dir = DirAccess.open("res://")
+	var blocks_dir = DirAccess.open(systemBaseDirectory)
 	var files = []
 	
 	var dirs = ["Blocks"]
