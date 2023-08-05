@@ -1,6 +1,6 @@
 [gd_scene load_steps=4 format=3 uid="uid://bl5igur7y2g8s"]
 
-[ext_resource type="Script" path="res://EditorUI.gd" id="1_avofj"]
+[ext_resource type="Script" path="res://EditorSystem/EditorUI.gd" id="1_avofj"]
 [ext_resource type="Script" path="res://Palette.gd" id="2_r11f3"]
 [ext_resource type="Script" path="res://StatMonitor.gd" id="3_bua5r"]
 
