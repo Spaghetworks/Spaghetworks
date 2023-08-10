@@ -2,20 +2,21 @@ extends Node
 
 # Loads and assembles a block from a config file.
 
+var systemBaseDirectory = "res://BlockSystem"
 var blocks = {}
 var loaded = false
 signal block_registered
 
 func _ready():
 	print("Begin loading")
-	var blocks_dir = DirAccess.open("res://")
+	var blocks_dir = DirAccess.open(systemBaseDirectory)
 	var files = []
 	
 	var dirs = ["Blocks"]
 	var dir = dirs.pop_front()
 
 	while dir != null:
-		blocks_dir.change_dir(dir)
+		blocks_dir.change_dir(dir) 
 		print(dir)
 		# Search first directory in list
 		for file in blocks_dir.get_files():

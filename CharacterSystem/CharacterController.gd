@@ -55,3 +55,6 @@ func _unhandled_input(event):
 	if event is InputEventMouseMotion:
 		rotation.y -= event.relative.x * sensitivity
 		camera.rotation.x -= event.relative.y * sensitivity
+
+func get_camera():
+	return camera

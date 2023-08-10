@@ -1,6 +1,10 @@
-[gd_scene load_steps=4 format=3 uid="uid://dc22xe8nqjrxt"]
+[gd_scene load_steps=8 format=3 uid="uid://dc22xe8nqjrxt"]
 
-[ext_resource type="Script" path="res://CharacterController.gd" id="1_b7ton"]
+[ext_resource type="Script" path="res://CharacterSystem/CharacterController.gd" id="1_b7ton"]
+[ext_resource type="Texture2D" uid="uid://dwj2g6eq8023n" path="res://OrthoCross.png" id="2_0rt46"]
+[ext_resource type="Script" path="res://Toolbelt.gd" id="2_ewbx6"]
+[ext_resource type="PackedScene" uid="uid://brv5gql2tf83r" path="res://Impulse_Tool.tscn" id="3_2xrat"]
+[ext_resource type="Script" path="res://CenteredSprite.gd" id="3_o6yyv"]
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_cuyvo"]
 radius = 0.4
@@ -21,6 +25,14 @@ shape = SubResource("SphereShape3D_cuyvo")
 
 [node name="Camera3D" type="Camera3D" parent="HeadShape"]
 
+[node name="RayCast3D" type="RayCast3D" parent="HeadShape/Camera3D"]
+target_position = Vector3(0, 0, -2)
+
+[node name="Sprite2D" type="Sprite2D" parent="HeadShape/Camera3D"]
+position = Vector2(1280, 720)
+texture = ExtResource("2_0rt46")
+script = ExtResource("3_o6yyv")
+
 [node name="HeadDriver" type="RigidBody3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.45, 0)
 mass = 0.1
@@ -36,3 +48,8 @@ node_a = NodePath("..")
 node_b = NodePath("../HeadDriver")
 linear_limit/upper_distance = 0.6
 linear_limit/lower_distance = -0.35
+
+[node name="Toolbelt" type="Node3D" parent="."]
+script = ExtResource("2_ewbx6")
+
+[node name="ImpulseTool" parent="Toolbelt" instance=ExtResource("3_2xrat")]

@@ -1,6 +1,6 @@
 [gd_scene load_steps=4 format=3 uid="uid://bl5igur7y2g8s"]
 
-[ext_resource type="Script" path="res://EditorUI.gd" id="1_avofj"]
+[ext_resource type="Script" path="res://EditorSystem/EditorUI.gd" id="1_avofj"]
 [ext_resource type="Script" path="res://Palette.gd" id="2_r11f3"]
 [ext_resource type="Script" path="res://StatMonitor.gd" id="3_bua5r"]
 
@@ -15,23 +15,26 @@ mouse_filter = 2
 script = ExtResource("1_avofj")
 
 [node name="Button" type="Button" parent="."]
-layout_mode = 0
+layout_mode = 1
 offset_right = 8.0
 offset_bottom = 8.0
 text = "Restart Editor"
 
 [node name="Button2" type="Button" parent="."]
-layout_mode = 0
+layout_mode = 1
 offset_left = 121.0
 offset_right = 204.0
 offset_bottom = 31.0
 text = "Go to Sim"
 
 [node name="TabContainer" type="TabContainer" parent="."]
-layout_mode = 0
-offset_top = 1297.0
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_top = -72.0
 offset_right = 637.0
-offset_bottom = 1369.0
+grow_vertical = 0
 script = ExtResource("2_r11f3")
 
 [node name="Panel" type="Panel" parent="."]
