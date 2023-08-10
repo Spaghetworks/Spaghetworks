@@ -2,7 +2,7 @@ extends Node3D
 
 var first_frame = true
 var raycast
-@onready var magnitude_label = $Label
+@onready var magnitude_label = $Panel/Label
 
 var magnitude = 1.0
 
