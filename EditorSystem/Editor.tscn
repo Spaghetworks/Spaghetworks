@@ -1,10 +1,10 @@
 [gd_scene load_steps=9 format=3 uid="uid://1wniauwjbqlj"]
 
-[ext_resource type="PackedScene" uid="uid://cce1d3rlkl60v" path="res://EditorEnvironment.tscn" id="1_3kth4"]
-[ext_resource type="Script" path="res://Editor.gd" id="1_ky32n"]
+[ext_resource type="PackedScene" uid="uid://cce1d3rlkl60v" path="res://EditorSystem/EditorEnvironment.tscn" id="1_3kth4"]
+[ext_resource type="Script" path="res://EditorSystem/Editor.gd" id="1_ky32n"]
 [ext_resource type="Script" path="res://CameraOrbitController.gd" id="2_aiub8"]
 [ext_resource type="Script" path="res://Cursor.gd" id="2_qlhw1"]
-[ext_resource type="PackedScene" uid="uid://bl5igur7y2g8s" path="res://Editor_UI.tscn" id="4_ylqfi"]
+[ext_resource type="PackedScene" uid="uid://bl5igur7y2g8s" path="res://EditorSystem/Editor_UI.tscn" id="4_ylqfi"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_4u2mi"]
 size = Vector3(0.1, 0.1, 0.1)
