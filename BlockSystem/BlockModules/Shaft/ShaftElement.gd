@@ -17,13 +17,14 @@ var connected_element_b
 var springs = []
 var constraints = []
 
-var rebuild_this_frame = true
+var rebuild_this_frame
 
 func initialize(params):
 	moment = params["moment"]
 	socket_names = params["sockets"]
 	name = params["element_name"]
 	axis = Vector3(params["axis"][0],params["axis"][1],params["axis"][2])
+	rebuild_this_frame = true
 
 func _enter_tree():
 	shaft_system = get_node("../../ShaftSystem")

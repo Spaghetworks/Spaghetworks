@@ -30,20 +30,20 @@ func _physics_process(delta):
 		step(delta)
 
 func step(delta):
-#	delta /= 10
+	delta /= substeps
 	for substep in range(0,substeps):
+		for body in get_children():
+			body.sub_pos = body.position + body.velocity * delta + body.acceleration * delta * delta / 2
+			body.position = body.sub_pos
 		for body in get_children():
 			# Accumulate torque
 			for spring in body.springs:
 				body.add_torque(spring.get_torque(body))
-			# Update pos and vel by velocity verlet
-			body.sub_pos = body.position + body.velocity * delta / substeps + body.acceleration * delta * delta / (substeps * substeps)
 			body.sub_acc = body.accumulated_torque / body.moment
-			body.sub_vel = body.velocity + (body.acceleration + body.sub_acc) * (delta / 2 / substeps)
-		
 		for body in get_children():
-			body.position = body.sub_pos
+			body.sub_vel = body.velocity + (body.acceleration + body.sub_acc) * (delta / 2)
 			body.velocity = body.sub_vel
+		for body in get_children():
 			body.acceleration = body.sub_acc
 			body.accumulated_torque = 0
 	for body in get_children():
