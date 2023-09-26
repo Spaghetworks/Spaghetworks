@@ -4,7 +4,7 @@ extends Node
 
 signal statistic_updated
 
-var stat_names = PackedStringArray(["blockcount_residential", "blockcount_commercial", "blockcount_industrial"])
+var stat_names = PackedStringArray(["shaft_count"])
 
 var statistics
 

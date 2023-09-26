@@ -11,7 +11,8 @@ static func to_world(proto_construct):
 	var block_mass
 	var block_moment
 	for block in construct.get_children():
-		if !block is MeshInstance3D:
+		if !block is MeshInstance3D: # not actually a block, it's a construct module
+			block.to_simulation()
 			continue
 #		# Call the block's to_world to signal modules to enter world mode
 #		block.to_world()
@@ -42,7 +43,6 @@ static func to_world(proto_construct):
 #	construct.set_center_of_mass(com)
 	proto_construct.queue_free()
 	
-	print(construct.get_center_of_mass())
 	return construct
 
 static func to_editor(construct):

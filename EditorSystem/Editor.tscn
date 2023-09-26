@@ -1,20 +1,14 @@
-[gd_scene load_steps=9 format=3 uid="uid://1wniauwjbqlj"]
+[gd_scene load_steps=8 format=3 uid="uid://1wniauwjbqlj"]
 
 [ext_resource type="PackedScene" uid="uid://cce1d3rlkl60v" path="res://EditorSystem/EditorEnvironment.tscn" id="1_3kth4"]
 [ext_resource type="Script" path="res://EditorSystem/Editor.gd" id="1_ky32n"]
 [ext_resource type="Script" path="res://CameraOrbitController.gd" id="2_aiub8"]
-[ext_resource type="Script" path="res://Cursor.gd" id="2_qlhw1"]
+[ext_resource type="Script" path="res://EditorSystem/Cursor.gd" id="3_55b8q"]
+[ext_resource type="Script" path="res://ShaftSystem.gd" id="3_ipy7v"]
 [ext_resource type="PackedScene" uid="uid://bl5igur7y2g8s" path="res://EditorSystem/Editor_UI.tscn" id="4_ylqfi"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_4u2mi"]
 size = Vector3(0.1, 0.1, 0.1)
-
-[sub_resource type="BoxMesh" id="BoxMesh_ojnjy"]
-size = Vector3(0.1, 0.1, 0.1)
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ewbem"]
-transparency = 1
-albedo_color = Color(0.498039, 0.498039, 1, 0.74902)
 
 [node name="World" type="Node3D"]
 script = ExtResource("1_ky32n")
@@ -24,9 +18,12 @@ script = ExtResource("1_ky32n")
 [node name="Construct_Root" type="Node3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3, 0)
 
+[node name="ShaftSystem" type="Node" parent="Construct_Root"]
+script = ExtResource("3_ipy7v")
+
 [node name="Cursor" type="Node3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3, 0)
-script = ExtResource("2_qlhw1")
+script = ExtResource("3_55b8q")
 
 [node name="Place_Area" type="Area3D" parent="Cursor"]
 transform = Transform3D(0.98, 0, 0, 0, 0.98, 0, 0, 0, 0.98, 0, 0, 0)
@@ -49,9 +46,7 @@ script = ExtResource("2_aiub8")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 3)
 current = true
 
-[node name="Cursor_Mesh" type="MeshInstance3D" parent="Cursor"]
-mesh = SubResource("BoxMesh_ojnjy")
-surface_material_override/0 = SubResource("StandardMaterial3D_ewbem")
+[node name="Cursor_Mesh" type="Node3D" parent="Cursor"]
 
 [node name="EditorUI" parent="." instance=ExtResource("4_ylqfi")]
 

@@ -1,0 +1,57 @@
+{
+	"name":"block_encoder_1_3",
+	"display_name":"Encoder size 1",
+	"category":"Shaft Power",
+	"mass":0.78,
+	"visual_mesh":
+	{
+		"name":"generator_none"
+	},
+	"collision_mesh":
+	{
+		"name":"generator_cuboid",
+		"dimensions":[3,1,3]
+	},
+	"modules":
+	[
+		{
+			"name":"Socket",
+			"params":
+			{
+				"socket_name":"socket_end_a",
+				"socket_type":"shaft_1",
+				"position":[0.0,0.05,0.0]
+			}
+		},
+
+		{
+			"name":"Socket",
+			"params":
+			{
+				"socket_name":"socket_end_b",
+				"socket_type":"shaft_1",
+				"position":[0.0,-0.05,0.0]
+			}
+		},
+
+		{
+			"name":"Shaft/ShaftElement",
+			"params":
+			{
+				"element_name":"encoder",
+				"moment":975E-6,
+				"sockets":["socket_end_a","socket_end_b"],
+				"axis":[0,1,0]
+			}
+		},
+
+		{
+			"name":"Shaft/ShaftMesh",
+			"params":
+			{
+				"element_name":"encoder",
+				"mesh_name":"Blocks/Shaft/block_encoder_1_3.obj"
+			}
+		},
+	]
+}

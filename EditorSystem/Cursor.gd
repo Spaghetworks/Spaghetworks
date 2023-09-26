@@ -9,6 +9,7 @@ var cursor_mesh # mesh which previews the object in hand
 var camera_focus # focus xform for the camera
 
 var collider_dirty = true # signals to check obstruction on next frame
+var rotate_mode = false # should directional inputs be translation or rotation?
 
 func _process(_delta):
 	if(collider_dirty):
@@ -24,6 +25,13 @@ func _enter_tree():
 	camera_focus = $Camera_Focus
 
 func _unhandled_input(event):
+	if(Input.is_action_just_pressed("EditorRotateMode")):
+		rotate_mode = true
+		print("Rotation")
+	elif(Input.is_action_just_released("EditorRotateMode")):
+		rotate_mode = false
+		print("Translation")
+	
 	if(event.is_action_pressed("EditorPlace")):
 		if hand == null:
 			print("no block selected")
@@ -36,7 +44,7 @@ func _unhandled_input(event):
 			print("placing item")
 			var new_block = hand.duplicate(7)
 			world.add_child(new_block)
-			new_block.global_position = global_position
+			new_block.global_transform = cursor_mesh.global_transform
 	
 	elif(event.is_action_pressed("EditorDelete")):
 		if(delete_area.has_overlapping_areas()):
@@ -47,35 +55,42 @@ func _unhandled_input(event):
 		else:
 			print("nothing to delete")
 	
+	
 	elif  (event.is_action_pressed("EditorCursorBack")
 		|| event.is_action_pressed("EditorCursorForward")
 		|| event.is_action_pressed("EditorCursorUp")
 		|| event.is_action_pressed("EditorCursorDown")
 		|| event.is_action_pressed("EditorCursorRight")
 		|| event.is_action_pressed("EditorCursorLeft")):
-		# Move the cursor
-		var cursor_move = Vector3(0,0,0)
-		if(event.is_action_pressed("EditorCursorBack")):
-			cursor_move.z = 1
-		if(event.is_action_pressed("EditorCursorForward")):
-			cursor_move.z = -1
-		if(event.is_action_pressed("EditorCursorUp")):
-			cursor_move.y = 1
-		if(event.is_action_pressed("EditorCursorDown")):
-			cursor_move.y = -1
-		if(event.is_action_pressed("EditorCursorRight")):
-			cursor_move.x = 1
-		if(event.is_action_pressed("EditorCursorLeft")):
-			cursor_move.x = -1
-		# Xform the cursor move direction per the camera's look direction
-		cursor_move = cursor_move.rotated(Vector3.UP, round(camera_focus.rotation.y / (PI/2)) * PI/2 * sign(camera_focus.basis.y.dot(Vector3.UP))) 
-		transform.origin += 0.1 * cursor_move
+		if(rotate_mode):
+			# Rotate the block in hand
+			var rotate = Vector3(
+				Input.get_axis("EditorCursorForward","EditorCursorBack"),
+				Input.get_axis("EditorCursorLeft","EditorCursorRight"),
+				Input.get_axis("EditorCursorDown","EditorCursorUp")
+			)
+			# Xform the rotation per the camera's look direction
+			rotate = rotate.rotated(Vector3.UP, round(camera_focus.rotation.y / (PI/2)) * PI/2 * sign(camera_focus.basis.y.dot(Vector3.UP)))
+			cursor_mesh.transform = cursor_mesh.transform.rotated_local(rotate, PI/2)
+			place_area.transform = place_area.transform.rotated_local(rotate, PI/2)
+		else:
+			# Move the cursor
+			var cursor_move = Vector3(
+				Input.get_axis("EditorCursorLeft","EditorCursorRight"),
+				Input.get_axis("EditorCursorDown","EditorCursorUp"),
+				Input.get_axis("EditorCursorForward","EditorCursorBack")
+			)
+			# Xform the cursor move direction per the camera's look direction
+			cursor_move = cursor_move.rotated(Vector3.UP, round(camera_focus.rotation.y / (PI/2)) * PI/2 * sign(camera_focus.basis.y.dot(Vector3.UP))) 
+			transform.origin += 0.1 * cursor_move
 
 func obstructed():
 	if(place_area.has_overlapping_areas()):
-		cursor_mesh.get_surface_override_material(0).albedo_color = Color(1, .5, .5, .75)
+		for mesh in cursor_mesh.get_children():
+			mesh.get_surface_override_material(0).albedo_color = Color(1, .5, .5, .75)
 	else:
-		cursor_mesh.get_surface_override_material(0).albedo_color = Color(.1, .5, 1, .75)
+		for mesh in cursor_mesh.get_children():
+			mesh.get_surface_override_material(0).albedo_color = Color(.1, .5, 1, .75)
 
 func _on_place_area_area_entered(_area):
 	obstructed()
@@ -88,4 +103,13 @@ func _on_selected_block_changed(block_name):
 	hand = get_node("/root/BlockLoader").blocks[block_name]
 #	print(hand.get_node("Area3D/CollisionShape3D"))
 	place_area.get_child(0).set_shape(hand.get_node("Area3D/CollisionShape3D").get_shape())
-	cursor_mesh.set_mesh(hand.get_mesh())
+	for node in cursor_mesh.get_children():
+		node.queue_free()
+	for mesh in hand.get_all_meshes():
+		var instance = MeshInstance3D.new()
+		instance.set_mesh(mesh)
+		var mat = StandardMaterial3D.new()
+		mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+		instance.set_surface_override_material(0, mat)
+		cursor_mesh.add_child(instance)
+#	cursor_mesh.set_mesh(hand.get_all_meshes())
