@@ -64,14 +64,14 @@ func add_constraint(constraint):
 	constraints.append(constraint)
 
 func get_position():
-	return body.position * (get_parent().global_transform.basis * axis).dot(body.principal_axis) + offset
+	return body.position * (get_parent().global_transform.basis * axis).dot(get_node("../..").global_transform.basis * body.principal_axis) + offset
 
 func get_velocity():
-	return body.velocity * (get_parent().global_transform.basis * axis).dot(body.principal_axis)
+	return body.velocity * (get_parent().global_transform.basis * axis).dot(get_node("../..").global_transform.basis * body.principal_axis)
 
 func on_state_updated(pos, vel):
 #	print((get_parent().global_transform * axis).dot(body.principal_axis))
-	state_updated.emit(pos * (get_parent().global_transform.basis * axis).dot(body.principal_axis) + offset, vel * (get_parent().global_transform.basis * axis).dot(body.principal_axis))
+	state_updated.emit(get_position(), get_velocity())
 
 func on_socket_a_connected(_local, remote):
 	connected_element_a = remote.element
