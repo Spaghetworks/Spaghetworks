@@ -3,7 +3,7 @@ extends Node
 var shaft_body = preload("res://ShaftBody.gd")
 var rebuild_requests = []
 var physics = false
-var substeps = 100
+var substeps = 10
 
 func request_rebuild(element):
 	rebuild_requests.append(element)

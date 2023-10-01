@@ -103,8 +103,9 @@ func _unhandled_input(event):
 				hide_interaction()
 
 func hide_interaction():
-	interacting.ui_provided.disconnect(_on_inter_ui_recieved)
-	editor_ui.hide_interaction()
+	if interacting:
+		interacting.ui_provided.disconnect(_on_inter_ui_recieved)
+		editor_ui.hide_interaction()
 	pass
 
 func _on_inter_ui_recieved(ui):
