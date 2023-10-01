@@ -67,7 +67,7 @@ func _unhandled_input(event):
 			editor_ui.clear_interaction()
 			editor_ui.show_interaction()
 			interacting.request_ui()
-		elif interacting:
+		else:
 			hide_interaction()
 	
 	elif  (event.is_action_pressed("EditorCursorBack")
@@ -98,14 +98,14 @@ func _unhandled_input(event):
 			cursor_move = cursor_move.rotated(Vector3.UP, round(camera_focus.rotation.y / (PI/2)) * PI/2 * sign(camera_focus.basis.y.dot(Vector3.UP))) 
 			transform.origin += 0.1 * cursor_move
 			
-			if interacting:
-				# Detach and close the interaction menu
-				hide_interaction()
+			# Detach and close the interaction menu
+			hide_interaction()
 
 func hide_interaction():
 	if interacting:
 		interacting.ui_provided.disconnect(_on_inter_ui_recieved)
 		editor_ui.hide_interaction()
+		interacting = null
 	pass
 
 func _on_inter_ui_recieved(ui):
