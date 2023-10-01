@@ -14,8 +14,8 @@ static func to_world(proto_construct):
 		if !block is MeshInstance3D: # not actually a block, it's a construct module
 			block.to_simulation()
 			continue
-#		# Call the block's to_world to signal modules to enter world mode
-#		block.to_world()
+		# Call the block's to_world to signal modules to enter world mode
+		block.to_simulation()
 		# Add the block to CoM and moment of inertia
 		block_mass = block.get_meta("mass")
 #		com = (com * mass + block.position * block_mass) / (mass + block_mass)

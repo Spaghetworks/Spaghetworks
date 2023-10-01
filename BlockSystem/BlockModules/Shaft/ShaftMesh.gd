@@ -15,13 +15,15 @@ func initialize(params):
 	element_name = params["element_name"]
 
 func _enter_tree():
+	if element:
+		return
 	element = get_node("../" + element_name)
 	element.state_updated.connect(on_state_updated)
 	first_time = Time.get_unix_time_from_system()
 
 func on_state_updated(pos, vel):
-#	if sign(vel) != sign(last_velocity) && vel < 0:
-#		print(str(Time.get_unix_time_from_system() - first_time) + " " + str(pos))
+	if sign(vel) != sign(last_velocity) && vel < 0:
+		print(str(Time.get_unix_time_from_system() - first_time) + " " + str(pos))
 	transform = transform.rotated_local(element.axis, pos - last_position)
 	last_position = pos
 	last_velocity = vel

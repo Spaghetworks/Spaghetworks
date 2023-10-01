@@ -27,6 +27,8 @@ func initialize(params):
 	rebuild_this_frame = true
 
 func _enter_tree():
+	if shaft_system:
+		return
 	shaft_system = get_node("../../ShaftSystem")
 	
 	if socket_names.size() > 0:
@@ -59,6 +61,7 @@ func attach(shaft_body):
 
 func add_spring(spring):
 	springs.append(spring)
+	print("spring!" + str(springs.size()))
 
 func add_constraint(constraint):
 	constraints.append(constraint)

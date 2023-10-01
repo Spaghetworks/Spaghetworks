@@ -59,7 +59,7 @@
 			{
 				"spring_name":"spring",
 				"elements":["spring_a","spring_b"],
-				"spring_constant":78E-3
+				"spring_constant":780E-3
 			}
 		},
 	]

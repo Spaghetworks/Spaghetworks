@@ -54,5 +54,32 @@ script = ExtResource("3_bua5r")
 base_string = "Shafts: "
 stat_name = "shaft_count"
 
+[node name="InteractionMenu" type="Panel" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 11
+anchor_left = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -244.0
+grow_horizontal = 0
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="InteractionMenu"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+grow_horizontal = 2
+
+[node name="Label" type="Label" parent="InteractionMenu/VBoxContainer"]
+layout_mode = 2
+text = "Block Parameters"
+
+[node name="HSeparator" type="HSeparator" parent="InteractionMenu/VBoxContainer"]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="InteractionMenu/VBoxContainer"]
+layout_mode = 2
+
 [connection signal="pressed" from="Button" to="." method="_on_reload_pressed"]
 [connection signal="pressed" from="Button2" to="." method="_on_to_sim_pressed"]

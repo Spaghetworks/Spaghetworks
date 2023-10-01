@@ -7,9 +7,11 @@ var delete_area # collision shape should always remain a simple 1-cube
 				#TODO: _should_ it? why?
 var cursor_mesh # mesh which previews the object in hand
 var camera_focus # focus xform for the camera
+var editor_ui # root UI object
 
 var collider_dirty = true # signals to check obstruction on next frame
 var rotate_mode = false # should directional inputs be translation or rotation?
+var interacting # block which interaction menu is active
 
 func _process(_delta):
 	if(collider_dirty):
@@ -19,6 +21,7 @@ func _process(_delta):
 func _enter_tree():
 	get_node("/root/CursorGlobals").selected_block_changed.connect(_on_selected_block_changed)
 	world = get_parent().get_node("Construct_Root")
+	editor_ui = get_node("../EditorUI")
 	place_area = $Place_Area
 	delete_area = $Delete_Area
 	cursor_mesh = $Cursor_Mesh
@@ -52,9 +55,20 @@ func _unhandled_input(event):
 			print("deleting item")
 			delete_area.get_overlapping_areas()[0].get_parent().queue_free()
 			collider_dirty = true
+			hide_interaction()
 		else:
 			print("nothing to delete")
 	
+	elif (event.is_action_pressed("EditorInteract")):
+		if delete_area.has_overlapping_areas():
+		# Open and attach the interaction window
+			interacting = delete_area.get_overlapping_areas()[0].get_parent()
+			interacting.ui_provided.connect(_on_inter_ui_recieved)
+			editor_ui.clear_interaction()
+			editor_ui.show_interaction()
+			interacting.request_ui()
+		elif interacting:
+			hide_interaction()
 	
 	elif  (event.is_action_pressed("EditorCursorBack")
 		|| event.is_action_pressed("EditorCursorForward")
@@ -83,6 +97,18 @@ func _unhandled_input(event):
 			# Xform the cursor move direction per the camera's look direction
 			cursor_move = cursor_move.rotated(Vector3.UP, round(camera_focus.rotation.y / (PI/2)) * PI/2 * sign(camera_focus.basis.y.dot(Vector3.UP))) 
 			transform.origin += 0.1 * cursor_move
+			
+			if interacting:
+				# Detach and close the interaction menu
+				hide_interaction()
+
+func hide_interaction():
+	interacting.ui_provided.disconnect(_on_inter_ui_recieved)
+	editor_ui.hide_interaction()
+	pass
+
+func _on_inter_ui_recieved(ui):
+	editor_ui.add_interaction(ui)
 
 func obstructed():
 	if(place_area.has_overlapping_areas()):

@@ -46,8 +46,8 @@ func step(delta):
 		for body in get_children():
 			body.acceleration = body.sub_acc
 			body.accumulated_torque = 0
-	for body in get_children():
-		body.update_state()
+		for body in get_children():
+			body.update_state()
 
 func rebuild(element):
 	# Detach old shaft body (if extant) and add no-dupe to old body collection
