@@ -24,6 +24,11 @@ func _physics_process(delta):
 #	for body in get_children():
 #		body.set_state(body.position + body.velocity, constant_velocity)
 	
+	for body in get_children():
+		if body.elements == 0:
+			print("freeing body")
+			body.queue_free()
+	
 	# Physics sim
 	if physics:
 #		print("physics step")
@@ -59,6 +64,7 @@ func rebuild(element):
 	element.attach(new_body)
 	# Set up based on the starting element
 	new_body.moment = element.moment
+	new_body.elements = 1
 	new_body.principal_axis = element.get_parent().global_transform.basis * element.axis
 	# Springs and constraints
 	new_body.springs.append_array(element.springs)
@@ -83,6 +89,7 @@ func rebuild(element):
 		element[0].attach(new_body)
 		# Accumulate element into shaft body
 		new_body.moment += element[0].moment
+		new_body.elements += 1
 		# Rebuild constraints/springs
 		new_body.springs.append_array(element[0].springs)
 		new_body.constraints.append_array(element[0].constraints)
@@ -95,7 +102,9 @@ func rebuild(element):
 				element_queue.append([element[0].connected_element_b, element[0]])
 	# Clean up
 	for body in old_bodies:
-		body.queue_free()
+		if is_instance_valid(body):
+			body.queue_free()
 	print("Rebuild completed: " + new_body.to_string())
 	print(" Moment: " + str(new_body.moment))
+	print(" Elements: " + str(new_body.elements))
 	add_child(new_body)

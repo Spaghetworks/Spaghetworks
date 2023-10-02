@@ -4,6 +4,7 @@ signal state_updated
 
 var moment
 var principal_axis
+var elements = 0
 
 var position = 0
 var velocity = 0

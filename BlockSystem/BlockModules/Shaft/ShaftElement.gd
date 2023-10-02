@@ -51,8 +51,11 @@ func _physics_process(_delta):
 		shaft_system.request_rebuild(self)
 		rebuild_this_frame = false
 
+func _exit_tree():
+	body.elements -= 1
+
 func attach(shaft_body):
-	if body:
+	if is_instance_valid(body):
 		# Disconnect signals
 		body.state_updated.disconnect(on_state_updated)
 	body = shaft_body
