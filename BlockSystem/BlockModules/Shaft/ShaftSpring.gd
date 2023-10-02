@@ -16,7 +16,7 @@ func initialize(params):
 	spring_constant = params["spring_constant"]
 
 func _enter_tree():
-	if element_a:
+	if element_a && element_b:
 		return
 	element_a = get_node("../" + element_names[0])
 	element_b = get_node("../" + element_names[1])

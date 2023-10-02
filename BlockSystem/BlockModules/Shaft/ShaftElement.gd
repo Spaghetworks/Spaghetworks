@@ -24,9 +24,9 @@ func initialize(params):
 	socket_names = params["sockets"]
 	name = params["element_name"]
 	axis = Vector3(params["axis"][0],params["axis"][1],params["axis"][2])
-	rebuild_this_frame = true
 
 func _enter_tree():
+	rebuild_this_frame = true
 	if shaft_system:
 		return
 	shaft_system = get_node("../../ShaftSystem")
