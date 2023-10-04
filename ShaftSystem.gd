@@ -17,7 +17,7 @@ func _physics_process(delta):
 	# Process rebuilds
 	while rebuild_requests.size() > 0:
 		# Pop a request and rebuild it
-		rebuild(rebuild_requests.pop_front())
+		rebuild(rebuild_requests.pop_back())
 	
 #	# Placeholder constant velocity rotation
 #	var constant_velocity = .001
@@ -79,9 +79,8 @@ func rebuild(element):
 		element_queue.append([element.connected_element_b,element])
 	# Repeat until empty:
 	while element_queue.size() > 0:
-		pass
 		# Pop next element
-		element = element_queue.pop_front()
+		element = element_queue.pop_back()
 		# Erase from rebuild_requests to avoid duplicate rebuilds
 		rebuild_requests.erase(element[0])
 		# Detach old shaft body and add no-dupe to old body collection
