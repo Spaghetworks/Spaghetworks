@@ -1,0 +1,54 @@
+{
+	"name":"block_shaft_1",
+	"display_name":"Shaft size 1",
+	"category":"Shaft Power",
+	"mass":0.78,
+	"visual_mesh":"Blocks/Shaft/block_shaft_1.obj",
+	"collision_mesh":
+	{
+		"name":"generator_cuboid",
+		"dimensions":[1,1,1]
+	},
+	"modules":
+	[
+		{
+			"name":"StatIntrinsic",
+			"params":
+			{
+				"stat_name":"shaft_count",
+				"stat_value":1
+			}
+		},
+
+		{
+			"name":"Socket",
+			"params":
+			{
+				"socket_name":"socket_end_a",
+				"socket_type":"shaft_1",
+				"position":[0.0,0.05,0.0]
+			}
+		},
+
+		{
+			"name":"Socket",
+			"params":
+			{
+				"socket_name":"socket_end_b",
+				"socket_type":"shaft_1",
+				"position":[0.0,-0.05,0.0]
+			}
+		},
+
+		{
+			"name":"Shaft/ShaftElement",
+			"params":
+			{
+				"element_name":"shaft",
+				"moment":975E-6,
+				"sockets":["socket_end_a","socket_end_b"],
+				"axis":[0,1,0]
+			}
+		},
+	]
+}

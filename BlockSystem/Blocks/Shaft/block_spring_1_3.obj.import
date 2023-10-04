@@ -1,0 +1,21 @@
+[remap]
+
+importer="wavefront_obj"
+importer_version=1
+type="Mesh"
+uid="uid://cm4lninmb2jwg"
+path="res://.godot/imported/block_spring_1_3.obj-e09d82e36c5ef89681ecca02d2c59077.mesh"
+
+[deps]
+
+files=["res://.godot/imported/block_spring_1_3.obj-e09d82e36c5ef89681ecca02d2c59077.mesh"]
+
+source_file="res://BlockSystem/Blocks/Shaft/block_spring_1_3.obj"
+dest_files=["res://.godot/imported/block_spring_1_3.obj-e09d82e36c5ef89681ecca02d2c59077.mesh", "res://.godot/imported/block_spring_1_3.obj-e09d82e36c5ef89681ecca02d2c59077.mesh"]
+
+[params]
+
+generate_tangents=true
+scale_mesh=Vector3(1, 1, 1)
+offset_mesh=Vector3(0, 0, 0)
+optimize_mesh=true

@@ -12,23 +12,26 @@ func _ready():
 	var blocks_dir = DirAccess.open(systemBaseDirectory)
 	var files = []
 	
+	
 	var dirs = ["Blocks"]
 	var dir = dirs.pop_front()
 
 	while dir != null:
 		blocks_dir.change_dir(dir) 
-		print(dir)
+		print(blocks_dir.get_current_dir())
 		# Search first directory in list
 		for file in blocks_dir.get_files():
 			if file.ends_with(".json"):
 				files.append(blocks_dir.get_current_dir() + "/" + file)
-		dirs.append_array(blocks_dir.get_directories())
+		for newdir in blocks_dir.get_directories():
+			dirs.append(blocks_dir.get_current_dir() + "/" + newdir)
 		# Remove first directory from list
 		dir = dirs.pop_front()
-#
+
 	print("Files: ", files)
 	
 	# Process each file into a block
+	var block_template = load("res://BlockSystem/Block.gd")
 	var block_data
 	for file in files:
 		# Read the file into structured data
@@ -37,7 +40,7 @@ func _ready():
 		print("Assembling block: " + block_data["name"])
 		# Assemble the scene
 		#  Create a new scene with a MeshInstance, Area3D, and CollisionShape.
-		var block = MeshInstance3D.new()
+		var block = block_template.new()
 		block.add_child(Area3D.new())
 		block.get_child(0).add_child(CollisionShape3D.new())
 		block.name = "MeshInstance3D"
@@ -46,7 +49,10 @@ func _ready():
 		#  Configure MeshInstance and CollisionShape
 		if typeof(block_data["visual_mesh"]) == TYPE_STRING:
 			# Asset path
-			print("ASSETS NOT YET HANDLED")
+			var mesh = load(systemBaseDirectory + "/" + block_data["visual_mesh"])
+			print(mesh)
+			block.set_mesh(mesh)
+			block.add_mesh(mesh)
 		else:
 			# Generator
 			print(block_data["visual_mesh"]["name"])
@@ -58,10 +64,13 @@ func _ready():
 					dimensions /= 10
 					box_shape.set_size(dimensions)
 					block.set_mesh(box_shape)
+					block.add_mesh(box_shape)
+				"generator_none":
+					pass
 		
 		if typeof(block_data["collision_mesh"]) == TYPE_STRING:
 			# Asset path
-			print("ASSETS NOT YET HANDLED")
+			print("COLLISION ASSETS NOT YET HANDLED")
 		else:
 			# Generator
 			print(block_data["collision_mesh"]["name"])
@@ -76,10 +85,11 @@ func _ready():
 		#  Add all modules
 		if block_data.has("modules"):
 			print("Adding modules")
-			var module = block_data["modules"].pop_front()
-			while module != null:
+			for module in block_data["modules"]:
 				print(module["name"])
-				print("MODULES NOT YET HANDLED")
+				var new_module = load(systemBaseDirectory +  "/BlockModules/" + module["name"] + ".gd").new()
+				block.add_child(new_module)
+				new_module.initialize(module["params"])
 		else:
 			print("No modules")
 		#  Write metadata
@@ -91,6 +101,7 @@ func _ready():
 		# Add node to collection
 		print(block)
 		blocks[block_data["name"]] = block
+		
 		# Emit signal
 		print("Block registered: " + block_data["name"])
 		block_registered.emit(block_data["name"], block_data["display_name"])

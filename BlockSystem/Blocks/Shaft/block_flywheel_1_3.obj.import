@@ -1,0 +1,21 @@
+[remap]
+
+importer="wavefront_obj"
+importer_version=1
+type="Mesh"
+uid="uid://dhurmnd1rw2t8"
+path="res://.godot/imported/block_flywheel_1_3.obj-8a7d20b002a12dd73ccd49b850addafa.mesh"
+
+[deps]
+
+files=["res://.godot/imported/block_flywheel_1_3.obj-8a7d20b002a12dd73ccd49b850addafa.mesh"]
+
+source_file="res://BlockSystem/Blocks/Shaft/block_flywheel_1_3.obj"
+dest_files=["res://.godot/imported/block_flywheel_1_3.obj-8a7d20b002a12dd73ccd49b850addafa.mesh", "res://.godot/imported/block_flywheel_1_3.obj-8a7d20b002a12dd73ccd49b850addafa.mesh"]
+
+[params]
+
+generate_tangents=true
+scale_mesh=Vector3(1, 1, 1)
+offset_mesh=Vector3(0, 0, 0)
+optimize_mesh=true
