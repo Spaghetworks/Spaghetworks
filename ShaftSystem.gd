@@ -14,14 +14,22 @@ func to_simulation():
 	print("Enabling shaft physics")
 	physics = true
 
-func _physics_process(delta):
-	# Process rebuilds
+func flush_rebuild_requests():
+	print("Begin rebuilds")
 	for rebuild_request in rebuild_request_set:
 		# Pop a request and rebuild it
 		if rebuild_request not in skip_rebuild_request_set:
 			rebuild(rebuild_request)
+		else:
+			print("Skip rebuild of " + rebuild_request.to_string())
 	rebuild_request_set.clear()
 	skip_rebuild_request_set.clear()
+	print("End rebuilds")
+
+func _physics_process(delta):
+	# Process rebuilds
+	if not rebuild_request_set.is_empty():
+		flush_rebuild_requests()
 	
 #	# Placeholder constant velocity rotation
 #	var constant_velocity = .001
