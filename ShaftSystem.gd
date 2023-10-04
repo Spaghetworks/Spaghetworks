@@ -1,12 +1,13 @@
 extends Node
 
 var shaft_body = preload("res://ShaftBody.gd")
-var rebuild_requests = []
+var rebuild_request_set = {}
+var skip_rebuild_request_set = {}
 var physics = false
 var substeps = 10
 
 func request_rebuild(element):
-	rebuild_requests.append(element)
+	rebuild_request_set[element] = true
 	print("Requesting rebuild of " + element.to_string())
 
 func to_simulation():
@@ -15,9 +16,12 @@ func to_simulation():
 
 func _physics_process(delta):
 	# Process rebuilds
-	while rebuild_requests.size() > 0:
+	for rebuild_request in rebuild_request_set:
 		# Pop a request and rebuild it
-		rebuild(rebuild_requests.pop_back())
+		if rebuild_request not in skip_rebuild_request_set:
+			rebuild(rebuild_request)
+	rebuild_request_set.clear()
+	skip_rebuild_request_set.clear()
 	
 #	# Placeholder constant velocity rotation
 #	var constant_velocity = .001
@@ -82,7 +86,7 @@ func rebuild(element):
 		# Pop next element
 		element = element_queue.pop_back()
 		# Erase from rebuild_requests to avoid duplicate rebuilds
-		rebuild_requests.erase(element[0])
+		skip_rebuild_request_set[element[0]] = true
 		# Detach old shaft body and add no-dupe to old body collection
 		if element[0].body && !old_bodies.has(element[0].body):
 			old_bodies.append(element[0].body)
