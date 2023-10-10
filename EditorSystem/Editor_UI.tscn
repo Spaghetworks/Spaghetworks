@@ -14,18 +14,18 @@ grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("1_avofj")
 
-[node name="Button" type="Button" parent="."]
+[node name="Restart Editor" type="Button" parent="."]
 layout_mode = 1
 offset_right = 8.0
 offset_bottom = 8.0
 text = "Restart Editor"
 
-[node name="Button2" type="Button" parent="."]
+[node name="Go To Sim" type="Button" parent="."]
 layout_mode = 1
-offset_left = 121.0
-offset_right = 204.0
+offset_left = 119.0
+offset_right = 233.0
 offset_bottom = 31.0
-text = "Go to Sim"
+text = "Go To Sim"
 
 [node name="TabContainer" type="TabContainer" parent="."]
 layout_mode = 1
@@ -81,5 +81,5 @@ layout_mode = 2
 [node name="VBoxContainer" type="VBoxContainer" parent="InteractionMenu/VBoxContainer"]
 layout_mode = 2
 
-[connection signal="pressed" from="Button" to="." method="_on_reload_pressed"]
-[connection signal="pressed" from="Button2" to="." method="_on_to_sim_pressed"]
+[connection signal="pressed" from="Restart Editor" to="." method="_on_reload_pressed"]
+[connection signal="pressed" from="Go To Sim" to="." method="_on_to_sim_pressed"]
