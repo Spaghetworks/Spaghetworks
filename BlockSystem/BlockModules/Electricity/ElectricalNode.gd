@@ -1,5 +1,5 @@
 class_name ElectricalNode
-extends Node
+extends RefCounted
 
 const MIN_CAPACITANCE = 0.0001
 
@@ -43,14 +43,3 @@ func _change_charge_by(additional_charge):
 # Data:
 # Capacitance (charge per volt)
 # Charge
-
-
-
-# Called when the node enters the scene tree for the first time.
-func _ready():
-	pass # Replace with function body.
-
-
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta):
-	pass
