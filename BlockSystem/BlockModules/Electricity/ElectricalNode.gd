@@ -1,20 +1,27 @@
 class_name ElectricalNode
 extends RefCounted
 
-const MIN_CAPACITANCE = 0.0001
+const MIN_CAPACITANCE = 1e-12
 
 # Assumed set on creation and never changed:
-@export var capacitance: float = MIN_CAPACITANCE
+@export_category("Write-once")
+@export_range(0, 100, 1, "or_greater", "hide_slider", "hide_slider", "suffix:farads") \
+	var capacitance: float = MIN_CAPACITANCE
 
 # May change over time:
-@export var charge: float = 0
+@export_category("Dynamic")
+@export_range(0, 0, 0, "or_less", "or_greater", "hide_slider", "suffix:colombs") var charge: float = 0
+var incoming_elements : Array[ElectricalSimpleElement] = []
+var outgoing_elements : Array[ElectricalSimpleElement] = []
+var observing_elements: Array = [] # TODO: specify type
+var connected_element_types: Dictionary = {}
 
 # Internal:
 var delta_charge: float = 0
 
 
-func initialize(params) -> void:
-	capacitance = max(params.capacitance, MIN_CAPACITANCE)
+#func initialize(params) -> void:
+#	capacitance = max(params.capacitance, MIN_CAPACITANCE)
 
 func get_voltage() -> float:
 	return charge / capacitance
@@ -22,22 +29,40 @@ func get_voltage() -> float:
 func get_charge() -> float:
 	return charge
 
-func get_capacitance() -> float:
-	return capacitance
-
-func send_charge_to(other_node : ElectricalNode, charge : float) -> void:
-	if other_node != null:
-		other_node._change_charge_by(-charge)
-	else:
-		# Magic charge input
-		pass
-	_change_charge_by(charge)
-
-func on_after_electrical_update() -> void:
+func _on_after_electrical_update() -> void:
 	charge += delta_charge
 	delta_charge = 0
 
-func _change_charge_by(additional_charge):
+func _on_connected_element(element : ElectricalSimpleElement):
+	assert(not connected_element_types.has(element), "[ElectricalSystem] The electrical element must not be already connected to this electrical node")
+
+	if element.source_end.get_ref() == self:
+		outgoing_elements.append(element)
+		connected_element_types[element] = ElectricalSimpleElement.ConnectionType.SOURCE
+	elif element.sink_end.get_ref() == self:
+		incoming_elements.append(element)
+		connected_element_types[element] = ElectricalSimpleElement.ConnectionType.SINK
+	else:
+		push_warning("[ElectricalSystem]", "The electrical element is not connected to this electrical node")
+
+func _on_disconnected_element(element : ElectricalSimpleElement):
+	if connected_element_types.has(element):
+		if connected_element_types[element] == ElectricalSimpleElement.ConnectionType.SOURCE:
+			assert(outgoing_elements.has(element), "[ElectricalSystem] ElectricalNode in invalid state: connected_element_types indicates that element is connected with this node as a source, but outgoing_elements does not include element!")
+			outgoing_elements.erase(element)
+		elif connected_element_types[element] == ElectricalSimpleElement.ConnectionType.SINK:
+			assert(incoming_elements.has(element), "[ElectricalSystem] ElectricalNode in invalid state: connected_element_types indicates that element is connected with this node as a sink, but incoming_elements does not include element!")
+			incoming_elements.erase(element)
+		else:
+			push_warning("[ElectricalSystem]", "_on_disconnected_element called but electrical element was not connected with this electrical node as a source or sink")
+
+func _on_element_begin_observe(_element):
+	assert(false, "TODO: Not implemented")
+
+func _on_element_end_observe(_element):
+	assert(false, "TODO: Not implemented")
+
+func _change_charge_by(additional_charge : float):
 	delta_charge += additional_charge
 
 # Data:
