@@ -6,16 +6,21 @@ enum ConnectionType { SOURCE, SINK, OBSERVE }
 signal electrical_element_connected(element : ElectricalSimpleElement)
 signal electrical_element_disconnected(element : ElectricalSimpleElement)
 
+@export_range(1e-12, 100, 1, "or_greater", "suffix:ohms") var resistance : float = 1e-12
+@export_range(0, 100, 1, "or_greater", "suffix:henry") var inductance : float = 1e-9
+
 ### @type {WeakRef<ElectricalNode>}
 var source_end : WeakRef = weakref(null)
 ### @type {WeakRef<ElectricalNode>}
 var sink_end : WeakRef = weakref(null)
- 
+
+var current_from_voltage : Callable = resistor_current_from_voltage.bind(resistance);
+
+
 @export_range(0, 0, 0, "or_less", "or_greater", "hide_slider", "suffix:amperes") \
 	var current : float = 0
 
 var delta_current : float = 0
-
 
 func connect_electrical_nodes(source : ElectricalNode, sink : ElectricalNode) -> void:
 	if source_end.get_ref() != null or sink_end.get_ref() != null:
@@ -54,3 +59,8 @@ func disconnect_electrical_nodes():
 		electrical_element_disconnected.disconnect(sink_element._on_disconnected_element)
 	if source_element == null and sink_element == null:
 		push_warning("[ElectricalSystem]", "Attempting to disconnect already-disconnected element.", get_stack())
+
+static func resistor_current_from_voltage(resistance : float, voltage : float):
+	# V = IR
+	# I = V / R
+	return voltage / resistance;
