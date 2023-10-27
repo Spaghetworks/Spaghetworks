@@ -7,6 +7,9 @@ const MIN_CAPACITANCE = 1e-12
 @export_category("Write-once")
 @export_range(0, 100, 1, "or_greater", "hide_slider", "hide_slider", "suffix:farads") \
 	var capacitance: float = MIN_CAPACITANCE
+@export_subgroup("Voltage source")
+@export var is_voltage_source : bool = false
+@export_range(-10, 10, 0.5, "or_less", "or_greater", "suffix:volts") var source_voltage : float = 0
 
 # May change over time:
 @export_category("Dynamic")
@@ -32,6 +35,8 @@ func get_charge() -> float:
 func _on_after_electrical_update() -> void:
 	charge += delta_charge
 	delta_charge = 0
+	if is_voltage_source:
+		charge = capacitance * source_voltage
 
 func _on_connected_element(element : ElectricalSimpleElement):
 	assert(not connected_element_types.has(element), "[ElectricalSystem] The electrical element must not be already connected to this electrical node")
