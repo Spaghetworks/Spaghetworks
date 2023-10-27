@@ -16,11 +16,34 @@ var sink_end : WeakRef = weakref(null)
 
 var current_from_voltage : Callable = resistor_current_from_voltage.bind(resistance);
 
+var has_been_processed_this_tick : bool = false
 
 @export_range(0, 0, 0, "or_less", "or_greater", "hide_slider", "suffix:amperes") \
 	var current : float = 0
 
 var delta_current : float = 0
+
+func _on_electrical_update(delta_time : float):
+	var source_voltage : float = 0
+	var sink_voltage : float = 0
+	var source_node : ElectricalNode = source_end.get_ref() as ElectricalNode
+	var sink_node : ElectricalNode = sink_end.get_ref() as ElectricalNode
+	
+	if source_node != null:
+		source_voltage = source_node.get_voltage()
+	if sink_node != null:
+		sink_voltage = sink_node.get_voltage()
+	
+	var voltage_drop : float = source_voltage - sink_voltage
+	var current : float = current_from_voltage.call(voltage_drop)
+	var delta_charge : float = current * delta_time
+	if source_node != null:
+		source_node._change_charge_by(-delta_charge)
+	if sink_node != null:
+		sink_node._change_charge_by(delta_charge)
+
+func _on_after_electrical_update():
+	has_been_processed_this_tick = false
 
 func connect_electrical_nodes(source : ElectricalNode, sink : ElectricalNode) -> void:
 	if source_end.get_ref() != null or sink_end.get_ref() != null:
