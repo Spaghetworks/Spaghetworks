@@ -6,6 +6,9 @@ enum ConnectionType { SOURCE, SINK, OBSERVE }
 signal electrical_element_connected(element : ElectricalSimpleElement)
 signal electrical_element_disconnected(element : ElectricalSimpleElement)
 
+# @param {energy} energy
+signal energy_dissipated(energy : float)
+
 ### @type {resistance}
 @export_range(1e-12, 100, 1, "or_greater", "suffix:ohms") var resistance : float = 1e-12
 ### @type {inductance}
@@ -50,15 +53,27 @@ func _on_electrical_update(delta_time : float) -> void:
 	if not (effective_resistance is float):
 		assert(false, "get_effective_resistance was set to a function of a signature other than (float) -> float")
 	
+	# Update current and differential of current
 	var last_current : float = current
 	current = voltage_drop / effective_resistance
+	delta_current = delta_current * exp(-delta_time * resistance / inductance) + (current - last_current) / delta_time
+	
+	# Calculate change in charges
 	var correction_from_induction : float = get_inductance_correction(delta_time)
 	var delta_charge : float = current * delta_time + correction_from_induction
+	var energy_dissipated : float = delta_charge * absf(voltage_drop)
+	
+	_execute_charge_transfer(delta_charge, voltage_drop)
+
+func _execute_charge_transfer(delta_charge : float, voltage_drop : float) -> void:
+	var source_node : ElectricalNode = source_end.get_ref() as ElectricalNode
+	var sink_node : ElectricalNode = sink_end.get_ref() as ElectricalNode
+	
 	if source_node != null:
 		source_node._change_charge_by(-delta_charge)
 	if sink_node != null:
 		sink_node._change_charge_by(delta_charge)
-	delta_current = delta_current * exp(-delta_time * resistance / inductance) + (current - last_current) / delta_time
+	energy_dissipated.emit(delta_charge * voltage_drop)
 
 func _on_pre_electrical_update() -> void:
 	has_been_processed_this_tick = false
