@@ -72,6 +72,9 @@ func add_constraint(constraint):
 func get_position():
 	return body.position * (get_parent().global_transform.basis * axis).dot(get_node("../..").global_transform.basis * body.principal_axis) + offset
 
+func get_sub_pos():
+	return body.sub_pos * (get_parent().global_transform.basis * axis).dot(get_node("../..").global_transform.basis * body.principal_axis) + offset
+
 func get_velocity():
 	return body.velocity * (get_parent().global_transform.basis * axis).dot(get_node("../..").global_transform.basis * body.principal_axis)
 

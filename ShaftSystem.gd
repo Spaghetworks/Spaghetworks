@@ -53,19 +53,17 @@ func step(delta):
 	for substep in range(0,substeps):
 		for body in children:
 			body.sub_pos = body.position + body.velocity * delta + body.acceleration * delta * delta / 2
-			body.position = body.sub_pos
 		for body in children:
 			# Accumulate torque
 			for spring in body.springs:
-				body.add_torque(spring.get_torque(body))
+				body.add_torque(spring.get_sub_torque(body))
 			body.sub_acc = body.accumulated_torque / body.moment
-		for body in children:
 			body.sub_vel = body.velocity + (body.acceleration + body.sub_acc) * (delta / 2)
-			body.velocity = body.sub_vel
 		for body in children:
-			body.acceleration = body.sub_acc
+			body.position = body.sub_pos
 			body.accumulated_torque = 0
-		for body in children:
+			body.acceleration = body.sub_acc
+			body.velocity = body.sub_vel
 			body.update_state()
 
 func rebuild(element):

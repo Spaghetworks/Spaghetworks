@@ -36,6 +36,15 @@ func get_torque(body):
 		displacement *= -1
 #	print(displacement)
 	return displacement * spring_constant
+	
+func get_sub_torque(body):
+	var displacement = \
+		element_a.get_sub_pos() - \
+		element_b.get_sub_pos()
+	displacement += spring_preload
+	if body != element_b.body:
+		displacement *= -1
+	return displacement * spring_constant
 
 func assemble_ui():
 	ui = VBoxContainer.new()
