@@ -53,21 +53,28 @@ func _on_electrical_update(delta_time : float) -> void:
 	if not (effective_resistance is float):
 		assert(false, "get_effective_resistance was set to a function of a signature other than (float) -> float")
 	
-	# Update current and differential of current
-	var last_current : float = current
-	current = voltage_drop / effective_resistance
-	delta_current = delta_current * exp(-delta_time * resistance / inductance) + (current - last_current) / delta_time
-	
 	# Calculate change in charges
 	var correction_from_induction : float = get_inductance_correction(delta_time)
 	var delta_charge : float = current * delta_time + correction_from_induction
 	var energy_dissipated : float = delta_charge * absf(voltage_drop)
+	
+	# Update current and differential of current
+	var last_current : float = current
+	current = voltage_drop / effective_resistance
+	delta_current = delta_current * exp(-delta_time * resistance / inductance) + (current - last_current) / delta_time
 	
 	_execute_charge_transfer(delta_charge, voltage_drop)
 
 func _execute_charge_transfer(delta_charge : float, voltage_drop : float) -> void:
 	var source_node : ElectricalNode = source_end.get_ref() as ElectricalNode
 	var sink_node : ElectricalNode = sink_end.get_ref() as ElectricalNode
+	
+	var limit : float = INF
+	
+	if delta_charge > 0 and source_node != null:
+		limit = source_node.get_numeric_charge_change_cutoff()
+	elif delta_charge < 0 and sink_node != null:
+		pass
 	
 	if source_node != null:
 		source_node._change_charge_by(-delta_charge)

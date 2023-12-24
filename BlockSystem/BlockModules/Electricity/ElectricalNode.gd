@@ -32,6 +32,9 @@ func get_voltage() -> float:
 func get_charge() -> float:
 	return charge
 
+func get_numeric_charge_change_cutoff() -> float:
+	return charge / 2
+
 func _on_after_electrical_update() -> void:
 	charge += delta_charge
 	delta_charge = 0
