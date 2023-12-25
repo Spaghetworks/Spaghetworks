@@ -1,0 +1,13 @@
+[configuration]
+entry_symbol = "gdext_rust_init"
+compatibility_minimum = 4.1
+
+[libraries]
+linux.debug.x86_64 =     "res://rust/target/debug/libspaghet.so"
+linux.release.x86_64 =   "res://rust/target/release/libspaghet.so"
+windows.debug.x86_64 =   "res://rust/target/debug/libspaghet.dll"
+windows.release.x86_64 = "res://rust/target/release/libspaghet.dll"
+macos.debug =            "res://rust/target/debug/libspaghet.dylib"
+macos.release =          "res://rust/target/release/libspaghet.dylib"
+macos.debug.arm64 =      "res://rust/target/debug/libspaghet.dylib"
+macos.release.arm64 =    "res://rust/target/release/libspaghet.dylib"
