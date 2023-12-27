@@ -1,0 +1,21 @@
+[remap]
+
+importer="wavefront_obj"
+importer_version=1
+type="Mesh"
+uid="uid://dha6jrdfkpmc1"
+path="res://.godot/imported/GearBevel-1.obj-b46a84df9c2f00649fae5a21147c6a56.mesh"
+
+[deps]
+
+files=["res://.godot/imported/GearBevel-1.obj-b46a84df9c2f00649fae5a21147c6a56.mesh"]
+
+source_file="res://BlockSystem/Blocks/Shaft/GearBevel-1.obj"
+dest_files=["res://.godot/imported/GearBevel-1.obj-b46a84df9c2f00649fae5a21147c6a56.mesh", "res://.godot/imported/GearBevel-1.obj-b46a84df9c2f00649fae5a21147c6a56.mesh"]
+
+[params]
+
+generate_tangents=true
+scale_mesh=Vector3(1, 1, 1)
+offset_mesh=Vector3(0, 0, 0)
+optimize_mesh=true

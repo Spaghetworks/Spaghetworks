@@ -5,6 +5,8 @@ var rebuild_request_set = {}
 var skip_rebuild_request_set = {}
 var physics = false
 var substeps = 10
+var constraint_matrix
+var constraints
 
 func request_rebuild(element):
 	rebuild_request_set[element] = true
@@ -24,6 +26,32 @@ func flush_rebuild_requests():
 			print("Skip rebuild of " + rebuild_request.to_string())
 	rebuild_request_set.clear()
 	skip_rebuild_request_set.clear()
+	print("Rebuilding constraint matrix")
+	constraints = []
+	for body in get_children():
+		if !is_instance_valid(body) || body.is_queued_for_deletion():
+			continue
+		constraints.append_array(body.a_constraints)
+	var size = constraints.size()
+	print(" Found ", size, " constraint(s)")
+	if size != 0:
+		constraint_matrix = PackedFloat64Array()
+		constraint_matrix.resize(size*size)
+		
+		var index = 0
+		for constraint in constraints:
+			for subconstraint in constraint.element_a.body.a_constraints:
+				constraint_matrix[index * size + constraints.find(subconstraint)] += 1.0 / constraint.element_a.body.moment
+			for subconstraint in constraint.element_a.body.b_constraints:
+				constraint_matrix[index * size + constraints.find(subconstraint)] -= 1.0 / constraint.element_a.body.moment
+			for subconstraint in constraint.element_b.body.a_constraints:
+				constraint_matrix[index * size + constraints.find(subconstraint)] -= 1.0 / constraint.element_a.body.moment
+			for subconstraint in constraint.element_b.body.b_constraints:
+				constraint_matrix[index * size + constraints.find(subconstraint)] += 1.0 / constraint.element_a.body.moment
+			
+			index += 1
+		print(constraint_matrix)
+		constraint_matrix = MatrixSolver.create(size, constraint_matrix)
 	print("End rebuilds")
 
 func _physics_process(delta):
@@ -58,6 +86,25 @@ func step(delta):
 			for spring in body.springs:
 				body.add_torque(spring.get_sub_torque(body))
 			body.sub_acc = body.accumulated_torque / body.moment
+		
+		# Solve linear system
+		if constraints.size() != 0:
+			var b_vec = PackedFloat64Array()
+			b_vec.resize(constraints.size())
+			var index = 0
+			for constraint in constraints:
+				b_vec[index] = constraint.element_a.get_sub_acc() - constraint.element_b.get_sub_acc()
+				index += 1
+			var x_vec = constraint_matrix.solve(b_vec)
+#			print(x_vec)
+			index = 0
+			for constraint in constraints:
+				constraint.element_a.add_torque( x_vec[index])
+				constraint.element_b.add_torque(-x_vec[index])
+				index += 1
+		
+		for body in children:
+			body.sub_acc = body.accumulated_torque / body.moment
 			body.sub_vel = body.velocity + (body.acceleration + body.sub_acc) * (delta / 2)
 		for body in children:
 			body.position = body.sub_pos
@@ -80,7 +127,8 @@ func rebuild(element):
 	new_body.principal_axis = element.get_parent().global_transform.basis * element.axis
 	# Springs and constraints
 	new_body.springs.append_array(element.springs)
-	new_body.constraints.append_array(element.constraints)
+	new_body.a_constraints.append_array(element.a_constraints)
+	new_body.b_constraints.append_array(element.b_constraints)
 	# Enqueue both ends (if applicable) and from-element
 	var element_queue = []
 	if element.connected_element_a:
@@ -103,7 +151,8 @@ func rebuild(element):
 		new_body.elements += 1
 		# Rebuild constraints/springs
 		new_body.springs.append_array(element[0].springs)
-		new_body.constraints.append_array(element[0].constraints)
+		new_body.a_constraints.append_array(element[0].a_constraints)
+		new_body.b_constraints.append_array(element[0].b_constraints)
 		# Enqueue next neighbor
 		if element[0].connected_element_a != element[1]: # check if this is neighbor A or B
 			if element[0].connected_element_a: # null check
@@ -118,4 +167,6 @@ func rebuild(element):
 	print("Rebuild completed: " + new_body.to_string())
 	print(" Moment: " + str(new_body.moment))
 	print(" Elements: " + str(new_body.elements))
+	print(" A-Constraints: " + str(new_body.a_constraints))
+	print(" B-Constraints: " + str(new_body.b_constraints))
 	add_child(new_body)

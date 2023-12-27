@@ -17,7 +17,8 @@ var sub_vel = 0
 var sub_acc = 0
 
 var springs = []
-var constraints = []
+var a_constraints = []
+var b_constraints = []
 
 func update_state():
 	state_updated.emit(position, velocity)

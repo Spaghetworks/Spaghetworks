@@ -15,7 +15,8 @@ var offset = 0
 var connected_element_a
 var connected_element_b
 var springs = []
-var constraints = []
+var a_constraints = []
+var b_constraints = []
 
 var rebuild_this_frame
 
@@ -66,8 +67,11 @@ func add_spring(spring):
 	springs.append(spring)
 	print("spring!" + str(springs.size()))
 
-func add_constraint(constraint):
-	constraints.append(constraint)
+func add_a_constraint(constraint):
+	a_constraints.append(constraint)
+
+func add_b_constraint(constraint):
+	b_constraints.append(constraint)
 
 func get_position():
 	return body.position * (get_parent().global_transform.basis * axis).dot(get_node("../..").global_transform.basis * body.principal_axis) + offset
@@ -75,8 +79,14 @@ func get_position():
 func get_sub_pos():
 	return body.sub_pos * (get_parent().global_transform.basis * axis).dot(get_node("../..").global_transform.basis * body.principal_axis) + offset
 
+func get_sub_acc():
+	return body.sub_acc * (get_parent().global_transform.basis * axis).dot(get_node("../..").global_transform.basis * body.principal_axis)
+
 func get_velocity():
 	return body.velocity * (get_parent().global_transform.basis * axis).dot(get_node("../..").global_transform.basis * body.principal_axis)
+
+func add_torque(torque):
+	body.add_torque(torque * (get_parent().global_transform.basis * axis).dot(get_node("../..").global_transform.basis * body.principal_axis))
 
 func on_state_updated(pos, vel):
 #	print((get_parent().global_transform * axis).dot(body.principal_axis))
