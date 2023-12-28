@@ -28,7 +28,7 @@
 			{
 				"socket_name":"socket_end_b",
 				"socket_type":"shaft_1",
-				"position":[0.0,-0.25,0.0]
+				"position":[0.0,0.25,0.0]
 			}
 		},
 

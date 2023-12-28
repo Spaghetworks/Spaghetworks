@@ -42,9 +42,11 @@ func get_sub_torque(body):
 		element_a.get_sub_pos() - \
 		element_b.get_sub_pos()
 	displacement += spring_preload
-	if body != element_b.body:
+	if body == element_a.body:
 		displacement *= -1
-	return displacement * spring_constant
+		return displacement * spring_constant * element_a.get_alignment()
+	else:
+		return displacement * spring_constant * element_b.get_alignment()
 
 func assemble_ui():
 	ui = VBoxContainer.new()

@@ -73,20 +73,23 @@ func add_a_constraint(constraint):
 func add_b_constraint(constraint):
 	b_constraints.append(constraint)
 
+func get_alignment():
+	return (get_parent().global_transform.basis * axis).dot(get_node("../..").global_transform.basis * body.principal_axis)
+
 func get_position():
-	return body.position * (get_parent().global_transform.basis * axis).dot(get_node("../..").global_transform.basis * body.principal_axis) + offset
+	return body.position * get_alignment() + offset
 
 func get_sub_pos():
-	return body.sub_pos * (get_parent().global_transform.basis * axis).dot(get_node("../..").global_transform.basis * body.principal_axis) + offset
+	return body.sub_pos * get_alignment() + offset
 
 func get_sub_acc():
-	return body.sub_acc * (get_parent().global_transform.basis * axis).dot(get_node("../..").global_transform.basis * body.principal_axis)
+	return body.sub_acc * get_alignment()
 
 func get_velocity():
-	return body.velocity * (get_parent().global_transform.basis * axis).dot(get_node("../..").global_transform.basis * body.principal_axis)
+	return body.velocity * get_alignment()
 
 func add_torque(torque):
-	body.add_torque(torque * (get_parent().global_transform.basis * axis).dot(get_node("../..").global_transform.basis * body.principal_axis))
+	body.add_torque(torque * get_alignment())
 
 func on_state_updated(pos, vel):
 #	print((get_parent().global_transform * axis).dot(body.principal_axis))

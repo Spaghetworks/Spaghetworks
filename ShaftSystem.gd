@@ -45,9 +45,9 @@ func flush_rebuild_requests():
 			for subconstraint in constraint.element_a.body.b_constraints:
 				constraint_matrix[index * size + constraints.find(subconstraint)] -= 1.0 / constraint.element_a.body.moment
 			for subconstraint in constraint.element_b.body.a_constraints:
-				constraint_matrix[index * size + constraints.find(subconstraint)] -= 1.0 / constraint.element_a.body.moment
+				constraint_matrix[index * size + constraints.find(subconstraint)] -= 1.0 / constraint.element_b.body.moment
 			for subconstraint in constraint.element_b.body.b_constraints:
-				constraint_matrix[index * size + constraints.find(subconstraint)] += 1.0 / constraint.element_a.body.moment
+				constraint_matrix[index * size + constraints.find(subconstraint)] += 1.0 / constraint.element_b.body.moment
 			
 			index += 1
 		print(constraint_matrix)
@@ -78,6 +78,7 @@ func step(delta):
 	delta /= substeps
 	var children = get_children()
 	
+#	for substep in range(0,1):
 	for substep in range(0,substeps):
 		for body in children:
 			body.sub_pos = body.position + body.velocity * delta + body.acceleration * delta * delta / 2
@@ -93,7 +94,7 @@ func step(delta):
 			b_vec.resize(constraints.size())
 			var index = 0
 			for constraint in constraints:
-				b_vec[index] = constraint.element_a.get_sub_acc() - constraint.element_b.get_sub_acc()
+				b_vec[index] = -constraint.element_a.get_sub_acc() + constraint.element_b.get_sub_acc()
 				index += 1
 			var x_vec = constraint_matrix.solve(b_vec)
 #			print(x_vec)
