@@ -58,6 +58,7 @@
 			"name":"Shaft/ShaftConstraint",
 			"params":
 			{
+				"ratio": [3,1],
 				"constraint_name":"gear",
 				"elements":["shaft_a","shaft_b"]
 			}
