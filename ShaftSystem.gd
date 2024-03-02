@@ -4,9 +4,13 @@ var shaft_body = preload("res://ShaftBody.gd")
 var rebuild_request_set = {}
 var skip_rebuild_request_set = {}
 var physics = false
+var physics_delay
 var substeps = 10
 var constraint_matrix
 var constraints
+
+# DEBUG
+var error = 0
 
 func request_rebuild(element):
 	rebuild_request_set[element] = true
@@ -15,6 +19,7 @@ func request_rebuild(element):
 func to_simulation():
 	print("Enabling shaft physics")
 	physics = true
+	physics_delay = 3
 
 func flush_rebuild_requests():
 	print("Begin rebuilds")
@@ -41,13 +46,13 @@ func flush_rebuild_requests():
 		var index = 0
 		for constraint in constraints:
 			for subconstraint in constraint.element_a.body.a_constraints:
-				constraint_matrix[index * size + constraints.find(subconstraint)] += 1.0 / constraint.element_a.body.moment * constraint.ratio[0]
+				constraint_matrix[index * size + constraints.find(subconstraint)] += 1.0 / constraint.element_a.body.moment * constraint.ratio[1] * subconstraint.ratio[0] * constraint.element_a.get_alignment()
 			for subconstraint in constraint.element_a.body.b_constraints:
-				constraint_matrix[index * size + constraints.find(subconstraint)] -= 1.0 / constraint.element_a.body.moment * constraint.ratio[0]
+				constraint_matrix[index * size + constraints.find(subconstraint)] -= 1.0 / constraint.element_a.body.moment * constraint.ratio[1] * subconstraint.ratio[1] * constraint.element_a.get_alignment()
 			for subconstraint in constraint.element_b.body.a_constraints:
-				constraint_matrix[index * size + constraints.find(subconstraint)] -= 1.0 / constraint.element_b.body.moment * constraint.ratio[1]
+				constraint_matrix[index * size + constraints.find(subconstraint)] -= 1.0 / constraint.element_b.body.moment * constraint.ratio[0] * subconstraint.ratio[0] * constraint.element_a.get_alignment()
 			for subconstraint in constraint.element_b.body.b_constraints:
-				constraint_matrix[index * size + constraints.find(subconstraint)] += 1.0 / constraint.element_b.body.moment * constraint.ratio[1]
+				constraint_matrix[index * size + constraints.find(subconstraint)] += 1.0 / constraint.element_b.body.moment * constraint.ratio[0] * subconstraint.ratio[1] * constraint.element_a.get_alignment()
 			
 			index += 1
 		print(constraint_matrix)
@@ -71,8 +76,10 @@ func _physics_process(delta):
 	
 	# Physics sim
 	if physics:
-#		print("physics step")
-		step(delta)
+		if physics_delay == 0:
+			step(delta)
+		else:
+			physics_delay -= 1
 
 func step(delta):
 	delta /= substeps
@@ -100,14 +107,20 @@ func step(delta):
 #			print(x_vec)
 			index = 0
 			for constraint in constraints:
-				constraint.element_a.add_torque( x_vec[index])
-				constraint.element_b.add_torque(-x_vec[index])
+				constraint.element_a.add_torque( x_vec[index] * constraint.ratio[1])
+				constraint.element_b.add_torque(-x_vec[index] * constraint.ratio[0])
 				index += 1
 		
 		for body in children:
 			body.sub_acc = body.accumulated_torque / body.moment
 			body.sub_vel = body.velocity + (body.acceleration + body.sub_acc) * (delta / 2)
 		for body in children:
+			for constraint in body.a_constraints:
+				error = (constraint.ratio[1] * constraint.element_a.get_sub_acc() - constraint.ratio[0] * constraint.element_b.get_sub_acc())
+				print(error)
+#				if abs(error) > 1:
+#					print("zeroing error")
+#					error = 0
 			body.position = body.sub_pos
 			body.accumulated_torque = 0
 			body.acceleration = body.sub_acc

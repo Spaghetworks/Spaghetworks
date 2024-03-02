@@ -66,6 +66,7 @@ func assemble_ui():
 	ui.get_child(1).add_child(line[1])
 
 func _on_spring_preload_changed(text):
+	print(text)
 	spring_preload = float(text)
 
 func _on_ui_requested():

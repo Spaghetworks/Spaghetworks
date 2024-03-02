@@ -1,0 +1,108 @@
+{
+	"name":"block_gear_spur_1_1_3",
+	"display_name":"Gearset 1:3",
+	"category":"Shaft Power",
+	"mass":31,
+	"visual_mesh":
+	{
+		"name":"generator_none"
+	},
+	"collision_mesh":
+	{
+		"name":"generator_cuboid",
+		"dimensions":[6,1,6]
+	},
+	"modules":
+	[
+		{
+			"name":"Socket",
+			"params":
+			{
+				"socket_name":"socket_3_a",
+				"socket_type":"shaft_1",
+				"position":[0.0,0.05,0.0]
+			}
+		},
+
+		{
+			"name":"Socket",
+			"params":
+			{
+				"socket_name":"socket_3_b",
+				"socket_type":"shaft_1",
+				"position":[0.0,-0.05,0.0]
+			}
+		},
+
+		{
+			"name":"Socket",
+			"params":
+			{
+				"socket_name":"socket_1_a",
+				"socket_type":"shaft_1",
+				"position":[-0.4,0.05,0.0]
+			}
+		},
+
+		{
+			"name":"Socket",
+			"params":
+			{
+				"socket_name":"socket_1_b",
+				"socket_type":"shaft_1",
+				"position":[-0.4,-0.05,0.0]
+			}
+		},
+
+		{
+			"name":"Shaft/ShaftElement",
+			"params":
+			{
+				"element_name":"gear_1",
+					"moment":15.7E-3,
+				"sockets":["socket_1_a","socket_1_b"],
+				"axis":[0,1,0]
+			}
+		},
+
+		{
+			"name":"Shaft/ShaftElement",
+			"params":
+			{
+				"element_name":"gear_3",
+				"moment":1.27,
+				"sockets":["socket_3_a","socket_3_b"],
+				"axis":[0,1,0]
+			}
+		},
+
+		{
+			"name":"Shaft/ShaftConstraint",
+			"params":
+			{
+				"ratio": [-1,3],
+				"constraint_name":"gear",
+				"elements":["gear_1","gear_3"]
+			}
+		},
+
+		{
+			"name":"Shaft/ShaftMesh",
+			"params":
+			{
+				"element_name":"gear_1",
+				"mesh_name":"Blocks/Shaft/block_spur_1_1.obj",
+				"offset":[-0.4,0,0]
+			}
+		},
+
+		{
+			"name":"Shaft/ShaftMesh",
+			"params":
+			{
+				"element_name":"gear_3",
+				"mesh_name":"Blocks/Shaft/block_spur_1_3.obj"
+			}
+		},
+	]
+}

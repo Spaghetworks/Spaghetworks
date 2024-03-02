@@ -17,6 +17,8 @@ var connected_element_b
 var springs = []
 var a_constraints = []
 var b_constraints = []
+var alignment
+var alignment_dirty = true
 
 var rebuild_this_frame
 
@@ -62,6 +64,7 @@ func attach(shaft_body):
 	body = shaft_body
 	# Connect signals
 	body.state_updated.connect(on_state_updated)
+	alignment_dirty = true
 
 func add_spring(spring):
 	springs.append(spring)
@@ -74,7 +77,10 @@ func add_b_constraint(constraint):
 	b_constraints.append(constraint)
 
 func get_alignment():
-	return (get_parent().global_transform.basis * axis).dot(get_node("../..").global_transform.basis * body.principal_axis)
+	if alignment_dirty:
+		alignment = (get_parent().global_transform.basis * axis).dot(get_node("../..").global_transform.basis * body.principal_axis)
+		alignment_dirty = false
+	return alignment
 
 func get_position():
 	return body.position * get_alignment() + offset
