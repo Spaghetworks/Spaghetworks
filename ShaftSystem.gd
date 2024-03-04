@@ -46,13 +46,13 @@ func flush_rebuild_requests():
 		var index = 0
 		for constraint in constraints:
 			for subconstraint in constraint.element_a.body.a_constraints:
-				constraint_matrix[index * size + constraints.find(subconstraint)] += 1.0 / constraint.element_a.body.moment * constraint.ratio[1] * subconstraint.ratio[0] * constraint.element_a.get_alignment()
+				constraint_matrix[index * size + constraints.find(subconstraint)] += 1.0 / constraint.element_a.body.moment * constraint.ratio[0] * subconstraint.ratio[0]
 			for subconstraint in constraint.element_a.body.b_constraints:
-				constraint_matrix[index * size + constraints.find(subconstraint)] -= 1.0 / constraint.element_a.body.moment * constraint.ratio[1] * subconstraint.ratio[1] * constraint.element_a.get_alignment()
+				constraint_matrix[index * size + constraints.find(subconstraint)] -= 1.0 / constraint.element_a.body.moment * constraint.ratio[0] * subconstraint.ratio[1]
 			for subconstraint in constraint.element_b.body.a_constraints:
-				constraint_matrix[index * size + constraints.find(subconstraint)] -= 1.0 / constraint.element_b.body.moment * constraint.ratio[0] * subconstraint.ratio[0] * constraint.element_a.get_alignment()
+				constraint_matrix[index * size + constraints.find(subconstraint)] -= 1.0 / constraint.element_b.body.moment * constraint.ratio[1] * subconstraint.ratio[0]
 			for subconstraint in constraint.element_b.body.b_constraints:
-				constraint_matrix[index * size + constraints.find(subconstraint)] += 1.0 / constraint.element_b.body.moment * constraint.ratio[0] * subconstraint.ratio[1] * constraint.element_a.get_alignment()
+				constraint_matrix[index * size + constraints.find(subconstraint)] += 1.0 / constraint.element_b.body.moment * constraint.ratio[1] * subconstraint.ratio[1]
 			
 			index += 1
 		print(constraint_matrix)
@@ -102,22 +102,22 @@ func step(delta):
 			var index = 0
 			for constraint in constraints:
 				b_vec[index] = -constraint.element_a.get_sub_acc() * constraint.ratio[0] + constraint.element_b.get_sub_acc() * constraint.ratio[1]
+#				b_vec[index] = -constraint.element_a.get_sub_acc() + constraint.element_b.get_sub_acc()
 				index += 1
 			var x_vec = constraint_matrix.solve(b_vec)
 #			print(x_vec)
 			index = 0
 			for constraint in constraints:
-				constraint.element_a.add_torque( x_vec[index] * constraint.ratio[1])
-				constraint.element_b.add_torque(-x_vec[index] * constraint.ratio[0])
+				constraint.element_a.add_torque( x_vec[index] * constraint.ratio[0])
+				constraint.element_b.add_torque(-x_vec[index] * constraint.ratio[1])
 				index += 1
 		
 		for body in children:
 			body.sub_acc = body.accumulated_torque / body.moment
 			body.sub_vel = body.velocity + (body.acceleration + body.sub_acc) * (delta / 2)
 		for body in children:
-			for constraint in body.a_constraints:
-				error = (constraint.ratio[1] * constraint.element_a.get_sub_acc() - constraint.ratio[0] * constraint.element_b.get_sub_acc())
-				print(error)
+#			for constraint in body.a_constraints:
+#				print(constraint.ratio[0] * constraint.element_a.get_sub_acc() - constraint.ratio[1] * constraint.element_b.get_sub_acc())
 #				if abs(error) > 1:
 #					print("zeroing error")
 #					error = 0

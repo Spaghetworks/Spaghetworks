@@ -50,7 +50,7 @@
 				"element_name":"shaft_b",
 				"moment":975E-6,
 				"sockets":["socket_end_b"],
-				"axis":[0,1,0]
+				"axis":[0,-1,0]
 			}
 		},
 
