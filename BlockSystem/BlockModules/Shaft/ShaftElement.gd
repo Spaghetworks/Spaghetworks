@@ -97,6 +97,9 @@ func get_sub_pos():
 func get_sub_vel():
 	return body.sub_vel * get_alignment()
 
+func free_sub_vel(delta):
+	return get_alignment() * (2.0 / delta * body.velocity + body.acceleration + body.sub_acc)
+
 func get_sub_acc():
 	return body.sub_acc * get_alignment()
 

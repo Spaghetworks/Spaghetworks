@@ -110,7 +110,7 @@ func step(delta):
 			for constraint in constraints:
 				match constraint.type:
 					"proportional":
-						b_vec[index] = -constraint.element_a.get_sub_acc() * constraint.ratio[0] + constraint.element_b.get_sub_acc() * constraint.ratio[1]
+						b_vec[index] = -constraint.element_a.free_sub_vel(delta) * constraint.ratio[0] + constraint.element_b.free_sub_vel(delta) * constraint.ratio[1]
 					"constantvel":
 						b_vec[index] = -constraint.element_a.get_sub_acc()
 				index += 1
@@ -118,46 +118,31 @@ func step(delta):
 #			print(x_vec)
 			
 			var elided = []
-			while true:
-				index = 0
+			while false:
 				var broken = false
-#				print(x_vec)
+				index = 0
 				for constraint in constraints:
 					if elided.has(index):
 						index += 1
 						continue
 					match constraint.type:
 						"proportional":
-							var deltav = constraint.element_a.get_velocity() * constraint.ratio[1] - constraint.element_b.get_velocity() * constraint.ratio[0]
-							if !is_equal_approx(constraint.element_a.get_velocity() * constraint.ratio[1], constraint.element_b.get_velocity() * constraint.ratio[0]):
-								broken = true
+							if abs(x_vec[index]) > constraint.breaking_force:
 								elided.append(index)
-								constraint.element_a.body.sub_acc = constraint.element_a.body.accumulated_torque / constraint.element_a.body.moment
-								constraint.element_b.body.sub_acc = constraint.element_b.body.accumulated_torque / constraint.element_b.body.moment
-								x_vec[index] = clamp(restoring_force(delta, constraint.element_a, constraint.element_b, constraint.ratio),
-									-constraint.breaking_force,constraint.breaking_force)
-							elif abs(x_vec[index]) > constraint.breaking_force:
 								broken = true
-								elided.append(index)
 								x_vec[index] = clamp(x_vec[index], -constraint.breaking_force, constraint.breaking_force)
-							constraint.element_a.add_torque( x_vec[index] * constraint.ratio[0])
-							constraint.element_b.add_torque(-x_vec[index] * constraint.ratio[1])
+								constraint.element_a.add_torque( x_vec[index] * constraint.ratio[0])
+								constraint.element_b.add_torque(-x_vec[index] * constraint.ratio[1])
 					index += 1
 				
 				if !broken:
 					break
 				
-				if elided.size() == constraints.size():
-					break
-				
-				for body in children:
-					body.sub_acc = body.accumulated_torque / body.moment
-				
 				index = 0
 				for constraint in constraints:
 					match constraint.type:
 						"proportional":
-							b_vec[index] = -constraint.element_a.get_sub_acc() * constraint.ratio[0] + constraint.element_b.get_sub_acc() * constraint.ratio[1]
+							b_vec[index] = -constraint.element_a.free_sub_vel(delta) * constraint.ratio[0] + constraint.element_b.free_sub_vel(delta) * constraint.ratio[1]
 						"constantvel":
 							b_vec[index] = -constraint.element_a.get_sub_acc()
 					index += 1
@@ -165,7 +150,8 @@ func step(delta):
 				elided.sort()
 #				print(PackedInt64Array(elided))
 				x_vec = constraint_matrix.solve_elided(b_vec, PackedInt64Array(elided))
-				
+			print(elided.size())
+			
 			index = 0
 			for constraint in constraints:
 				match constraint.type:
@@ -194,12 +180,12 @@ func step(delta):
 			body.velocity = body.sub_vel
 			body.update_state()
 
-func restoring_force(delta, body_a, body_b, ratio):
-	return (
-		  2.0/delta * (ratio[1]*body_b.get_velocity() - ratio[0]*body_a.get_velocity()) 
-		+ (ratio[1]*body_b.get_acceleration() - ratio[0]*body_a.get_acceleration()) 
-		+ (ratio[1]*body_b.get_sub_acc() - ratio[0]*body_a.get_sub_acc())
-		) / (ratio[1]*ratio[1]*1.0/body_b.moment + ratio[0]*ratio[0]*1.0/body_a.moment)
+#func restoring_force(delta, body_a, body_b, ratio):
+#	return (
+#		  2.0/delta * (ratio[1]*body_b.get_velocity() - ratio[0]*body_a.get_velocity()) 
+#		+ (ratio[1]*body_b.get_acceleration() - ratio[0]*body_a.get_acceleration()) 
+#		+ (ratio[1]*body_b.get_sub_acc() - ratio[0]*body_a.get_sub_acc())
+#		) / (ratio[1]*ratio[1]*1.0/body_b.moment + ratio[0]*ratio[0]*1.0/body_a.moment)
 
 func rebuild(element):
 	# Detach old shaft body (if extant) and add no-dupe to old body collection
