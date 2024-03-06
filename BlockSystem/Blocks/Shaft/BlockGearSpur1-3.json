@@ -80,7 +80,9 @@
 			"name":"Shaft/ShaftConstraint",
 			"params":
 			{
+				"type":"proportional",
 				"ratio": [-1,3],
+				"breaking_force":10000.0,
 				"constraint_name":"gear",
 				"elements":["gear_1","gear_3"]
 			}

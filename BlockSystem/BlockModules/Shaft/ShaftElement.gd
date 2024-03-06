@@ -85,14 +85,20 @@ func get_alignment():
 func get_position():
 	return body.position * get_alignment() + offset
 
+func get_velocity():
+	return body.velocity * get_alignment()
+
+func get_acceleration():
+	return body.acceleration * get_alignment()
+
 func get_sub_pos():
 	return body.sub_pos * get_alignment() + offset
 
+func get_sub_vel():
+	return body.sub_vel * get_alignment()
+
 func get_sub_acc():
 	return body.sub_acc * get_alignment()
-
-func get_velocity():
-	return body.velocity * get_alignment()
 
 func add_torque(torque):
 	body.add_torque(torque * get_alignment())

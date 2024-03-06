@@ -58,7 +58,9 @@
 			"name":"Shaft/ShaftConstraint",
 			"params":
 			{
+				"type":"proportional",
 				"ratio": [1,1],
+				"breaking_force":10000.0,
 				"constraint_name":"gear",
 				"elements":["shaft_a","shaft_b"]
 			}

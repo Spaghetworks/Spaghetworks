@@ -45,14 +45,21 @@ func flush_rebuild_requests():
 		
 		var index = 0
 		for constraint in constraints:
-			for subconstraint in constraint.element_a.body.a_constraints:
-				constraint_matrix[index * size + constraints.find(subconstraint)] += 1.0 / constraint.element_a.body.moment * constraint.ratio[0] * subconstraint.ratio[0]
-			for subconstraint in constraint.element_a.body.b_constraints:
-				constraint_matrix[index * size + constraints.find(subconstraint)] -= 1.0 / constraint.element_a.body.moment * constraint.ratio[0] * subconstraint.ratio[1]
-			for subconstraint in constraint.element_b.body.a_constraints:
-				constraint_matrix[index * size + constraints.find(subconstraint)] -= 1.0 / constraint.element_b.body.moment * constraint.ratio[1] * subconstraint.ratio[0]
-			for subconstraint in constraint.element_b.body.b_constraints:
-				constraint_matrix[index * size + constraints.find(subconstraint)] += 1.0 / constraint.element_b.body.moment * constraint.ratio[1] * subconstraint.ratio[1]
+			match constraint.type:
+				"proportional":
+					for subconstraint in constraint.element_a.body.a_constraints:
+						constraint_matrix[index * size + constraints.find(subconstraint)] += 1.0 / constraint.element_a.body.moment * constraint.ratio[0] * subconstraint.ratio[0]
+					for subconstraint in constraint.element_a.body.b_constraints:
+						constraint_matrix[index * size + constraints.find(subconstraint)] -= 1.0 / constraint.element_a.body.moment * constraint.ratio[0] * subconstraint.ratio[1]
+					for subconstraint in constraint.element_b.body.a_constraints:
+						constraint_matrix[index * size + constraints.find(subconstraint)] -= 1.0 / constraint.element_b.body.moment * constraint.ratio[1] * subconstraint.ratio[0]
+					for subconstraint in constraint.element_b.body.b_constraints:
+						constraint_matrix[index * size + constraints.find(subconstraint)] += 1.0 / constraint.element_b.body.moment * constraint.ratio[1] * subconstraint.ratio[1]
+				"constantvel":
+					for subconstraint in constraint.element_a.body.a_constraints:
+						constraint_matrix[index * size + constraints.find(subconstraint)] += 1.0 / constraint.element_a.body.moment
+					for subconstraint in constraint.element_a.body.b_constraints:
+						constraint_matrix[index * size + constraints.find(subconstraint)] -= 1.0 / constraint.element_a.body.moment
 			
 			index += 1
 		print(constraint_matrix)
@@ -101,15 +108,75 @@ func step(delta):
 			b_vec.resize(constraints.size())
 			var index = 0
 			for constraint in constraints:
-				b_vec[index] = -constraint.element_a.get_sub_acc() * constraint.ratio[0] + constraint.element_b.get_sub_acc() * constraint.ratio[1]
-#				b_vec[index] = -constraint.element_a.get_sub_acc() + constraint.element_b.get_sub_acc()
+				match constraint.type:
+					"proportional":
+						b_vec[index] = -constraint.element_a.get_sub_acc() * constraint.ratio[0] + constraint.element_b.get_sub_acc() * constraint.ratio[1]
+					"constantvel":
+						b_vec[index] = -constraint.element_a.get_sub_acc()
 				index += 1
 			var x_vec = constraint_matrix.solve(b_vec)
 #			print(x_vec)
+			
+			var elided = []
+			while true:
+				index = 0
+				var broken = false
+#				print(x_vec)
+				for constraint in constraints:
+					if elided.has(index):
+						index += 1
+						continue
+					match constraint.type:
+						"proportional":
+							var deltav = constraint.element_a.get_velocity() * constraint.ratio[1] - constraint.element_b.get_velocity() * constraint.ratio[0]
+							if !is_equal_approx(constraint.element_a.get_velocity() * constraint.ratio[1], constraint.element_b.get_velocity() * constraint.ratio[0]):
+								broken = true
+								elided.append(index)
+								constraint.element_a.body.sub_acc = constraint.element_a.body.accumulated_torque / constraint.element_a.body.moment
+								constraint.element_b.body.sub_acc = constraint.element_b.body.accumulated_torque / constraint.element_b.body.moment
+								x_vec[index] = clamp(restoring_force(delta, constraint.element_a, constraint.element_b, constraint.ratio),
+									-constraint.breaking_force,constraint.breaking_force)
+							elif abs(x_vec[index]) > constraint.breaking_force:
+								broken = true
+								elided.append(index)
+								x_vec[index] = clamp(x_vec[index], -constraint.breaking_force, constraint.breaking_force)
+							constraint.element_a.add_torque( x_vec[index] * constraint.ratio[0])
+							constraint.element_b.add_torque(-x_vec[index] * constraint.ratio[1])
+					index += 1
+				
+				if !broken:
+					break
+				
+				if elided.size() == constraints.size():
+					break
+				
+				for body in children:
+					body.sub_acc = body.accumulated_torque / body.moment
+				
+				index = 0
+				for constraint in constraints:
+					match constraint.type:
+						"proportional":
+							b_vec[index] = -constraint.element_a.get_sub_acc() * constraint.ratio[0] + constraint.element_b.get_sub_acc() * constraint.ratio[1]
+						"constantvel":
+							b_vec[index] = -constraint.element_a.get_sub_acc()
+					index += 1
+				
+				elided.sort()
+#				print(PackedInt64Array(elided))
+				x_vec = constraint_matrix.solve_elided(b_vec, PackedInt64Array(elided))
+				
 			index = 0
 			for constraint in constraints:
-				constraint.element_a.add_torque( x_vec[index] * constraint.ratio[0])
-				constraint.element_b.add_torque(-x_vec[index] * constraint.ratio[1])
+				match constraint.type:
+					"proportional":
+						if abs(x_vec[index]) > constraint.breaking_force:
+							print("Excess force!")
+							print(index, " ", x_vec[index])
+						constraint.element_a.add_torque( x_vec[index] * constraint.ratio[0])
+						constraint.element_b.add_torque(-x_vec[index] * constraint.ratio[1])
+					"constantvel":
+						constraint.element_a.add_torque(x_vec[index])
 				index += 1
 		
 		for body in children:
@@ -126,6 +193,13 @@ func step(delta):
 			body.acceleration = body.sub_acc
 			body.velocity = body.sub_vel
 			body.update_state()
+
+func restoring_force(delta, body_a, body_b, ratio):
+	return (
+		  2.0/delta * (ratio[1]*body_b.get_velocity() - ratio[0]*body_a.get_velocity()) 
+		+ (ratio[1]*body_b.get_acceleration() - ratio[0]*body_a.get_acceleration()) 
+		+ (ratio[1]*body_b.get_sub_acc() - ratio[0]*body_a.get_sub_acc())
+		) / (ratio[1]*ratio[1]*1.0/body_b.moment + ratio[0]*ratio[0]*1.0/body_a.moment)
 
 func rebuild(element):
 	# Detach old shaft body (if extant) and add no-dupe to old body collection
