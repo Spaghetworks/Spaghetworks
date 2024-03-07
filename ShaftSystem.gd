@@ -12,6 +12,11 @@ var constraints
 # DEBUG
 var error = 0
 
+func _ready():
+	var test = MatrixSolver.create(2, PackedFloat64Array([2,-1,-1,2]))
+	print(test.solve(PackedFloat64Array([-20,0])))
+	print(test.solve_elided(PackedFloat64Array([-20,10]), PackedInt64Array([0])))
+
 func request_rebuild(element):
 	rebuild_request_set[element] = true
 	print("Requesting rebuild of " + element.to_string())
@@ -112,13 +117,13 @@ func step(delta):
 					"proportional":
 						b_vec[index] = -constraint.element_a.free_sub_vel(delta) * constraint.ratio[0] + constraint.element_b.free_sub_vel(delta) * constraint.ratio[1]
 					"constantvel":
-						b_vec[index] = -constraint.element_a.get_sub_acc()
+						b_vec[index] = -constraint.element_a.free_sub_vel(delta) + 2 * constraint.velocity / delta
 				index += 1
 			var x_vec = constraint_matrix.solve(b_vec)
 #			print(x_vec)
 			
 			var elided = []
-			while false:
+			while true:
 				var broken = false
 				index = 0
 				for constraint in constraints:
@@ -138,19 +143,22 @@ func step(delta):
 				if !broken:
 					break
 				
+				for body in children:
+					body.sub_acc = body.accumulated_torque / body.moment
+				
 				index = 0
 				for constraint in constraints:
 					match constraint.type:
 						"proportional":
 							b_vec[index] = -constraint.element_a.free_sub_vel(delta) * constraint.ratio[0] + constraint.element_b.free_sub_vel(delta) * constraint.ratio[1]
 						"constantvel":
-							b_vec[index] = -constraint.element_a.get_sub_acc()
+							b_vec[index] = -constraint.element_a.free_sub_vel(delta) + 2 * constraint.velocity / delta
 					index += 1
 				
 				elided.sort()
 #				print(PackedInt64Array(elided))
 				x_vec = constraint_matrix.solve_elided(b_vec, PackedInt64Array(elided))
-			print(elided.size())
+#			print(elided.size())
 			
 			index = 0
 			for constraint in constraints:

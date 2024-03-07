@@ -10,7 +10,7 @@
 	"collision_mesh":
 	{
 		"name":"generator_cuboid",
-		"dimensions":[3,1,3]
+		"dimensions":[2,3,2]
 	},
 	"modules":
 	[
@@ -18,19 +18,20 @@
 			"name":"Socket",
 			"params":
 			{
-				"socket_name":"socket_end_a",
+				"socket_name":"output_socket",
 				"socket_type":"shaft_1",
-				"position":[0.0,0.05,0.0]
+				"position":[0.0,0.15,0.0]
 			}
 		},
 
 		{
-			"name":"Socket",
+			"name":"Shaft/ShaftElement",
 			"params":
 			{
-				"socket_name":"socket_end_b",
-				"socket_type":"shaft_1",
-				"position":[0.0,-0.05,0.0]
+				"element_name":"constvel",
+				"moment":975E-6,
+				"sockets":[],
+				"axis":[0,1,0]
 			}
 		},
 
@@ -46,22 +47,42 @@
 		},
 
 		{
-			"name":"Shaft/ShaftMesh",
-			"params":
-			{
-				"element_name":"internal",
-				"mesh_name":"Blocks/Shaft/block_encoder_1_3.obj"
-			}
-		},
-
-		{
 			"name":"Shaft/ShaftElement",
 			"params":
 			{
 				"element_name":"output",
 				"moment":975E-6,
-				"sockets":["socket_end_a","socket_end_b"],
+				"sockets":["output_socket"],
 				"axis":[0,1,0]
+			}
+		},
+
+		{
+			"name":"Shaft/ShaftMesh",
+			"params":
+			{
+				"element_name":"constvel",
+				"mesh_name":"Blocks/Shaft/block_barrel_1.obj",
+				"offset":[0,-0.1,0],
+			}
+		},
+
+		{
+			"name":"Shaft/ShaftMesh",
+			"params":
+			{
+				"element_name":"internal",
+				"mesh_name":"Blocks/Shaft/block_barrel_1.obj"
+			}
+		},
+
+		{
+			"name":"Shaft/ShaftMesh",
+			"params":
+			{
+				"element_name":"output",
+				"mesh_name":"Blocks/Shaft/block_barrel_1.obj",
+				"offset":[0,0.1,0],
 			}
 		},
 
@@ -71,8 +92,19 @@
 			{
 				"type":"constantvel",
 				"constraint_name":"constantvel",
-				"elements":["internal"],
+				"elements":["constvel"],
 				"velocity":10.0,
+			}
+		},
+
+		{
+			"name":"Shaft/ShaftSpring",
+			"params":
+			{
+				"spring_name":"spring",
+				"elements":["internal","output"],
+				"spring_constant":1000,
+				"spring_preload":0
 			}
 		},
 
@@ -82,9 +114,9 @@
 			{
 				"type":"proportional",
 				"ratio": [1,1],
-				"breaking_force":1000.0,
+				"breaking_force":100.0,
 				"constraint_name":"clutch",
-				"elements":["internal","output"]
+				"elements":["constvel","internal"]
 			}
 		},
 	]

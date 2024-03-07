@@ -33,11 +33,11 @@ func _enter_tree():
 			element_b.add_b_constraint(self)
 	update = true
 
-func _physics_process(_delta):
-	if !update:
-		return
-	if type == "constantvel":
-		if element_a.body && !element_a.rebuild_this_frame && element_a.shaft_system.physics_delay == 0:
-			print("setting velocity")
-			element_a.body.velocity = velocity
-			update = false
+#func _physics_process(_delta):
+#	if !update:
+#		return
+#	if type == "constantvel":
+#		if element_a.body && !element_a.rebuild_this_frame && element_a.shaft_system.physics_delay == 0:
+#			print("setting velocity")
+#			element_a.body.velocity = velocity
+#			update = false

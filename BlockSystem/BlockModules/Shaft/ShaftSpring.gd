@@ -3,17 +3,22 @@ extends Node
 @export var spring_constant:float
 @export var element_names:Array
 @export var breaking_torque:float
+@export var spring_preload:float
 
 var element_a
 var element_b
 var ui
 
-var spring_preload = 1
 
 func initialize(params):
 	name = params["spring_name"]
 	element_names = params["elements"]
 	spring_constant = params["spring_constant"]
+	print(params.has("spring_preload"))
+	if params.has("spring_preload"):
+		spring_preload = params["spring_preload"]
+	else:
+		spring_preload = 1
 
 func _enter_tree():
 	if element_a && element_b:
