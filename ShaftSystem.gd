@@ -141,6 +141,9 @@ func step(delta):
 				if !broken:
 					break
 				
+				if elided.size() == constraints.size():
+					break
+				
 				for body in children:
 					body.sub_acc = body.accumulated_torque / body.moment
 				
