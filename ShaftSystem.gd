@@ -76,15 +76,13 @@ func _physics_process(delta):
 	if not rebuild_request_set.is_empty():
 		flush_rebuild_requests()
 	
-#	# Placeholder constant velocity rotation
-#	var constant_velocity = .001
-#	for body in get_children():
-#		body.set_state(body.position + body.velocity, constant_velocity)
-	
 	for body in get_children():
 		if body.elements == 0:
 			print("freeing body")
 			body.queue_free()
+	
+	if get_children().size() == 0:
+		return
 	
 	# Physics sim
 	if physics:
@@ -120,8 +118,8 @@ func step(delta):
 						b_vec[index] = -constraint.element_a.free_sub_vel(delta) + 2 * constraint.velocity / delta
 				index += 1
 			var x_vec = constraint_matrix.solve(b_vec)
-#			print(x_vec)
 			
+			# Solve slip
 			var elided = []
 			while true:
 				var broken = false
@@ -156,9 +154,7 @@ func step(delta):
 					index += 1
 				
 				elided.sort()
-#				print(PackedInt64Array(elided))
 				x_vec = constraint_matrix.solve_elided(b_vec, PackedInt64Array(elided))
-#			print(elided.size())
 			
 			index = 0
 			for constraint in constraints:
@@ -177,23 +173,11 @@ func step(delta):
 			body.sub_acc = body.accumulated_torque / body.moment
 			body.sub_vel = body.velocity + (body.acceleration + body.sub_acc) * (delta / 2)
 		for body in children:
-#			for constraint in body.a_constraints:
-#				print(constraint.ratio[0] * constraint.element_a.get_sub_acc() - constraint.ratio[1] * constraint.element_b.get_sub_acc())
-#				if abs(error) > 1:
-#					print("zeroing error")
-#					error = 0
 			body.position = body.sub_pos
 			body.accumulated_torque = 0
 			body.acceleration = body.sub_acc
 			body.velocity = body.sub_vel
 			body.update_state()
-
-#func restoring_force(delta, body_a, body_b, ratio):
-#	return (
-#		  2.0/delta * (ratio[1]*body_b.get_velocity() - ratio[0]*body_a.get_velocity()) 
-#		+ (ratio[1]*body_b.get_acceleration() - ratio[0]*body_a.get_acceleration()) 
-#		+ (ratio[1]*body_b.get_sub_acc() - ratio[0]*body_a.get_sub_acc())
-#		) / (ratio[1]*ratio[1]*1.0/body_b.moment + ratio[0]*ratio[0]*1.0/body_a.moment)
 
 func rebuild(element):
 	# Detach old shaft body (if extant) and add no-dupe to old body collection

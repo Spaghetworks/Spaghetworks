@@ -39,8 +39,9 @@ func get_torque(body):
 	displacement += spring_preload
 	if body != element_b.body:
 		displacement *= -1
-#	print(displacement)
-	return displacement * spring_constant
+		return displacement * spring_constant * element_a.get_alignment()
+	else:
+		return displacement * spring_constant * element_b.get_alignment()
 	
 func get_sub_torque(body):
 	var displacement = \
@@ -55,7 +56,7 @@ func get_sub_torque(body):
 
 func assemble_ui():
 	ui = VBoxContainer.new()
-	ui.name = "spring"
+	ui.name = "Spring"
 	ui.add_child(Label.new())
 	ui.get_child(0).text = name
 	ui.add_child(GridContainer.new())
@@ -76,14 +77,3 @@ func _on_spring_preload_changed(text):
 
 func _on_ui_requested():
 	get_parent().provide_ui(ui)
-
-
-
-
-
-
-
-
-
-
-

@@ -45,6 +45,6 @@ static func to_world(proto_construct):
 	
 	return construct
 
-static func to_editor(construct):
+static func to_editor(_construct):
 	
 	pass

@@ -106,7 +106,7 @@ func get_sub_acc():
 func add_torque(torque):
 	body.add_torque(torque * get_alignment())
 
-func on_state_updated(pos, vel):
+func on_state_updated(_pos, _vel):
 #	print((get_parent().global_transform * axis).dot(body.principal_axis))
 	state_updated.emit(get_position(), get_velocity())
 
