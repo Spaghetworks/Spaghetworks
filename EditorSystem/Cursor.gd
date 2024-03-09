@@ -85,8 +85,8 @@ func _unhandled_input(event):
 			)
 			# Xform the rotation per the camera's look direction
 			control_rotate = control_rotate.rotated(Vector3.UP, round(camera_focus.rotation.y / (PI/2)) * PI/2 * sign(camera_focus.basis.y.dot(Vector3.UP)))
-			cursor_mesh.transform = cursor_mesh.transform.rotated_local(rotate, PI/2)
-			place_area.transform = place_area.transform.rotated_local(rotate, PI/2)
+			cursor_mesh.transform = cursor_mesh.transform.rotated_local(control_rotate, PI/2)
+			place_area.transform = place_area.transform.rotated_local(control_rotate, PI/2)
 		else:
 			# Move the cursor
 			var cursor_move = Vector3(
