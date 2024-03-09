@@ -5,8 +5,8 @@ compatibility_minimum = 4.1
 [libraries]
 linux.debug.x86_64 =     "res://rust/target/debug/libspaghet.so"
 linux.release.x86_64 =   "res://rust/target/release/libspaghet.so"
-windows.debug.x86_64 =   "res://rust/target/debug/libspaghet.dll"
-windows.release.x86_64 = "res://rust/target/release/libspaghet.dll"
+windows.debug.x86_64 =   "res://rust/target/debug/spaghet.dll"
+windows.release.x86_64 = "res://rust/target/release/spaghet.dll"
 macos.debug =            "res://rust/target/debug/libspaghet.dylib"
 macos.release =          "res://rust/target/release/libspaghet.dylib"
 macos.debug.arm64 =      "res://rust/target/debug/libspaghet.dylib"
