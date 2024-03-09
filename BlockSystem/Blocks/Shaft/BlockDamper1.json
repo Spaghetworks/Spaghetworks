@@ -1,0 +1,66 @@
+{
+	"name":"block_damper_1",
+	"display_name":"Damper 1",
+	"category":"Shaft Power",
+	"mass":0.78,
+	"visual_mesh":"Blocks/Shaft/block_spring_1_3.obj",
+	"collision_mesh":
+	{
+		"name":"generator_cuboid",
+		"dimensions":[3,3,3]
+	},
+	"modules":
+	[
+		{
+			"name":"Socket",
+			"params":
+			{
+				"socket_name":"socket_end_a",
+				"socket_type":"shaft_1",
+				"position":[0.0,0.15,0.0]
+			}
+		},
+
+		{
+			"name":"Socket",
+			"params":
+			{
+				"socket_name":"socket_end_b",
+				"socket_type":"shaft_1",
+				"position":[0.0,-0.15,0.0]
+			}
+		},
+
+		{
+			"name":"Shaft/ShaftElement",
+			"params":
+			{
+				"element_name":"shaft_a",
+				"moment":975E-6,
+				"sockets":["socket_end_a"],
+				"axis":[0,1,0]
+			}
+		},
+
+		{
+			"name":"Shaft/ShaftElement",
+			"params":
+			{
+				"element_name":"shaft_b",
+				"moment":975E-6,
+				"sockets":["socket_end_b"],
+				"axis":[0,1,0]
+			}
+		},
+
+		{
+			"name":"Shaft/ShaftDamper",
+			"params":
+			{
+				"damper_name":"damper",
+				"element_names":["shaft_a","shaft_b"],
+				"damping":1,
+			}
+		},
+	]
+}
