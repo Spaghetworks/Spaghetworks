@@ -1,3 +1,4 @@
+use crate::math::complex::Complex64;
 use std::mem::replace;
 use std::ops::Add;
 
@@ -53,8 +54,7 @@ struct InternalAcVoltageCollection {
 /// Represents a sinusoidal AC voltage with a given frequency and of the form a + jb
 struct InternalAcVoltageElement {
     frequency: Frequency,
-    re: f64,
-    im: f64,
+    complex_representation: Complex64,
 }
 
 pub trait Differentiable {
@@ -71,8 +71,7 @@ impl Differentiable for InternalAcVoltageElement {
     fn derivative(&self) -> Self::Output {
         Self {
             frequency: self.frequency,
-            re: -self.im * self.frequency,
-            im: self.re * self.frequency,
+            complex_representation: self.complex_representation.times_imaginary() * self.frequency,
         }
     }
 }
@@ -121,8 +120,7 @@ impl InternalAcVoltageCollection {
         for (index, iter_element) in self.voltage_elements.iter_mut().enumerate() {
             if iter_element.frequency == inserted_element.frequency {
                 // If the frequency matches, add to that frequency
-                iter_element.re += inserted_element.re;
-                iter_element.im += inserted_element.im;
+                iter_element.complex_representation += inserted_element.complex_representation;
                 return;
             } else if iter_element.frequency > inserted_element.frequency {
                 // If we find an element where the frequency is lesser, insert before it
@@ -172,8 +170,7 @@ impl InternalAcVoltageCollection {
                     index_b += 1;
 
                     let mut append_element = front_a;
-                    append_element.re += front_b.re;
-                    append_element.im += front_b.im;
+                    append_element.complex_representation += front_b.complex_representation;
                     output_list.push(append_element);
                 }
             }
@@ -241,8 +238,8 @@ impl Add for InternalAcVoltage {
                     if lhs_element.frequency == rhs_element.frequency {
                         InternalAcVoltage::One(InternalAcVoltageElement {
                             frequency: lhs_element.frequency,
-                            re: lhs_element.re + rhs_element.re,
-                            im: lhs_element.im + rhs_element.im,
+                            complex_representation: lhs_element.complex_representation
+                                + rhs_element.complex_representation,
                         })
                     } else {
                         InternalAcVoltage::Many(InternalAcVoltageCollection::from_unequal_pair(
@@ -275,5 +272,23 @@ impl Add for InternalAcVoltage {
                 }
             },
         }
+    }
+}
+
+impl From<()> for InternalAcVoltage {
+    fn from(_: ()) -> Self {
+        Self::None
+    }
+}
+
+impl From<InternalAcVoltageElement> for InternalAcVoltage {
+    fn from(value: InternalAcVoltageElement) -> Self {
+        Self::One(value)
+    }
+}
+
+impl Default for InternalAcVoltage {
+    fn default() -> Self {
+        Self::None
     }
 }
