@@ -78,7 +78,7 @@ impl Differentiable for InternalAcVoltageElement {
 
 impl AcVoltage for InternalAcVoltageElement {
     fn get_voltage_at_time(&self, time: f64) -> f64 {
-        todo!()
+        (self.complex_representation * Complex64::from_modulus_argument(time, 1.0)).re
     }
 }
 
