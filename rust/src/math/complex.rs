@@ -144,3 +144,34 @@ where
         result
     }
 }
+
+impl<T> Complex<T>
+where
+    T: Copy + Add + Mul + Neg<Output = T> + Sub + AddAssign + MulAssign + SubAssign + PartialEq,
+{
+    pub fn times_imaginary(&self) -> Self {
+        Self {
+            re: -self.im,
+            im: self.re,
+        }
+    }
+}
+
+impl Complex64 {
+    pub fn from_modulus_argument(modulus: f64, argument: f64) -> Self {
+        let (im, re) = modulus.sin_cos();
+        Complex64 {
+            re: re * argument,
+            im: im * argument,
+        }
+    }
+    pub fn argument(&self) -> f64 {
+        self.im.atan2(self.re)
+    }
+    pub fn squared_modulus(&self) -> f64 {
+        self.re * self.re + self.im * self.im
+    }
+    pub fn modulus(&self) -> f64 {
+        self.squared_modulus().sqrt()
+    }
+}
