@@ -158,6 +158,8 @@ where
 }
 
 impl Complex64 {
+    pub const ZERO: Complex64 = Complex64 { re: 0.0, im: 0.0 };
+
     pub fn from_modulus_argument(modulus: f64, argument: f64) -> Self {
         let (im, re) = modulus.sin_cos();
         Complex64 {
@@ -173,5 +175,11 @@ impl Complex64 {
     }
     pub fn modulus(&self) -> f64 {
         self.squared_modulus().sqrt()
+    }
+}
+
+impl Default for Complex64 {
+    fn default() -> Self {
+        Complex64 { re: 0.0, im: 0.0 }
     }
 }
