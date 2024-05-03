@@ -1,12 +1,13 @@
 use super::ac_graph_data::ResistorData;
 use super::ConstraintList;
+use super::RealType;
 use super::VertexType;
 use crate::util::{TypedInstanceId, Validatable};
 use godot::engine::Node;
 use godot::prelude::*;
 
 /// An AcVertex represents either a node or a component in the electrical diagram.
-#[derive(GodotClass)]
+#[derive(GodotClass, Debug)]
 #[class(base=Node, no_init)]
 pub struct AcVertex {
     base: Base<Node>,
@@ -17,7 +18,7 @@ pub struct AcVertex {
     constraints: ConstraintList,
 }
 
-#[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash)]
+#[derive(Copy, Clone, Debug, Eq, PartialEq, Ord, PartialOrd, Hash)]
 pub struct AcConnection {
     node: TypedInstanceId<AcVertex>,
     component: TypedInstanceId<AcVertex>,
@@ -81,7 +82,7 @@ impl Validatable for AcVertex {
             VertexType::Resistor(resistor_data) => {
                 if self.connections.len() == 2 {
                     self.connections.iter().all(|c| c.component.is_valid())
-                        && resistor_data.resistance >= 0f64
+                        && resistor_data.resistance >= (0 as RealType)
                 } else {
                     false
                 }
@@ -107,7 +108,7 @@ pub struct AcBridge {
 }
 
 // Represents a connected component in the electrical diagram with the same frequency
-#[derive(GodotClass)]
+#[derive(GodotClass, Debug)]
 #[class(base=Node)]
 pub struct AcSystem {
     base: Base<Node>,
@@ -148,7 +149,9 @@ impl AcSystem {
         let resistor = Gd::from_init_fn(|base| AcVertex {
             base,
             owner_system_id: self.to_gd().into(),
-            vertex_type: VertexType::Resistor(ResistorData { resistance: 0f64 }),
+            vertex_type: VertexType::Resistor(ResistorData {
+                resistance: (0 as RealType),
+            }),
             connections: Vec::new(),
             constraints: ConstraintList::default(),
         });
