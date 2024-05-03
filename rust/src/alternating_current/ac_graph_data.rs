@@ -32,11 +32,33 @@ pub enum AcMeasurable {
 
 #[derive(Clone, Copy, Debug)]
 pub enum AcMultiplier {
+    Zero,
+    Unit,
     Scalar(RealType),
     ScaledDerivative(RealType),
     ScaledIntegral(RealType),
     ScaleRotate(Complex<RealType>),
     General(Matrix2<RealType>),
+}
+
+impl From<AcMultiplier> for Matrix2<RealType> {
+    fn from(value: AcMultiplier) -> Self {
+        match value {
+            AcMultiplier::Zero => Matrix2::zeros(),
+            AcMultiplier::Unit => Matrix2::identity(),
+            AcMultiplier::Scalar(scalar) => Matrix2::new_scaling(scalar),
+            AcMultiplier::ScaledDerivative(scalar) => {
+                Matrix2::new(0 as RealType, scalar, -scalar, 0 as RealType)
+            }
+            AcMultiplier::ScaledIntegral(scalar) => {
+                Matrix2::new(0 as RealType, -scalar, scalar, 0 as RealType)
+            }
+            AcMultiplier::ScaleRotate(complex) => {
+                Matrix2::new(complex.re, complex.im, -complex.im, complex.re)
+            }
+            AcMultiplier::General(matrix) => matrix,
+        }
+    }
 }
 
 #[derive(Debug)]
@@ -60,12 +82,6 @@ impl Add<ConstraintElement> for ConstraintList {
     fn add(mut self, rhs: ConstraintElement) -> Self::Output {
         self.elements.push(rhs);
         self
-    }
-}
-
-impl From<ConstraintElement> for Matrix2<RealType> {
-    fn from(value: ConstraintElement) -> Self {
-        todo!()
     }
 }
 
