@@ -9,7 +9,7 @@ mod matrixsolver;
 pub use matrixsolver::MatrixSolver;
 
 mod alternating_current;
-pub use alternating_current::{AcBridge, AcComponent, AcNode, AcSystem};
+pub use alternating_current::{AcBridge, AcSystem, AcVertex};
 
 mod math;
 mod util;
