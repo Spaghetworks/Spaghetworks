@@ -7,6 +7,7 @@ use godot::{
 
 use super::Validatable;
 
+#[derive(Debug)]
 pub struct TypedInstanceId<T>
 where
     T: GodotClass,
