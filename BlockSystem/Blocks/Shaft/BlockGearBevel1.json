@@ -1,9 +1,9 @@
 {
-	"name":"block_spring_1_3",
-	"display_name":"Small Spring size 1",
+	"name":"block_gear_bevel_1",
+	"display_name":"Bevel Gear size 1",
 	"category":"Shaft Power",
 	"mass":0.78,
-	"visual_mesh":"Blocks/Shaft/block_spring_1_3.obj",
+	"visual_mesh":"Blocks/Shaft/block_gear_bevel_1.obj",
 	"collision_mesh":
 	{
 		"name":"generator_cuboid",
@@ -11,13 +11,14 @@
 	},
 	"modules":
 	[
+
 		{
 			"name":"Socket",
 			"params":
 			{
 				"socket_name":"socket_end_a",
 				"socket_type":"shaft_1",
-				"position":[0.0,0.15,0.0]
+				"position":[0.25,0.0,0.0]
 			}
 		},
 
@@ -27,7 +28,7 @@
 			{
 				"socket_name":"socket_end_b",
 				"socket_type":"shaft_1",
-				"position":[0.0,-0.15,0.0]
+				"position":[0.0,0.25,0.0]
 			}
 		},
 
@@ -35,10 +36,10 @@
 			"name":"Shaft/ShaftElement",
 			"params":
 			{
-				"element_name":"spring_a",
+				"element_name":"shaft_a",
 				"moment":975E-6,
 				"sockets":["socket_end_a"],
-				"axis":[0,1,0]
+				"axis":[1,0,0]
 			}
 		},
 
@@ -46,21 +47,23 @@
 			"name":"Shaft/ShaftElement",
 			"params":
 			{
-				"element_name":"spring_b",
+				"element_name":"shaft_b",
 				"moment":975E-6,
 				"sockets":["socket_end_b"],
-				"axis":[0,1,0]
+				"axis":[0,-1,0]
 			}
 		},
 
 		{
-			"name":"Shaft/ShaftSpring",
+			"name":"Shaft/ShaftConstraint",
 			"params":
 			{
-				"spring_name":"spring",
-				"elements":["spring_a","spring_b"],
-				"spring_constant":780E-3,
+				"type":"proportional",
+				"ratio": [1,1],
+				"breaking_force":10000.0,
+				"constraint_name":"gear",
+				"elements":["shaft_a","shaft_b"]
 			}
-		},
+		}
 	]
 }

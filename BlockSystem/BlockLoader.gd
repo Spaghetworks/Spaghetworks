@@ -82,6 +82,9 @@ func _ready():
 					dimensions /= 10
 					box_shape.set_size(dimensions)
 					block.get_child(0).get_child(0).set_shape(box_shape)
+#				"generator_cuboid_multi":
+#					for cuboid in block_data["collision_mesh"]["shapes"]:
+#						pass
 		#  Add all modules
 		if block_data.has("modules"):
 			print("Adding modules")

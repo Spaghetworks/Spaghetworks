@@ -78,15 +78,15 @@ func _unhandled_input(event):
 		|| event.is_action_pressed("EditorCursorLeft")):
 		if(rotate_mode):
 			# Rotate the block in hand
-			var rotate = Vector3(
+			var control_rotate = Vector3(
 				Input.get_axis("EditorCursorForward","EditorCursorBack"),
 				Input.get_axis("EditorCursorLeft","EditorCursorRight"),
 				Input.get_axis("EditorCursorDown","EditorCursorUp")
 			)
 			# Xform the rotation per the camera's look direction
-			rotate = rotate.rotated(Vector3.UP, round(camera_focus.rotation.y / (PI/2)) * PI/2 * sign(camera_focus.basis.y.dot(Vector3.UP)))
-			cursor_mesh.transform = cursor_mesh.transform.rotated_local(rotate, PI/2)
-			place_area.transform = place_area.transform.rotated_local(rotate, PI/2)
+			control_rotate = control_rotate.rotated(Vector3.UP, round(camera_focus.rotation.y / (PI/2)) * PI/2 * sign(camera_focus.basis.y.dot(Vector3.UP)))
+			cursor_mesh.transform = cursor_mesh.transform.rotated_local(control_rotate, PI/2)
+			place_area.transform = place_area.transform.rotated_local(control_rotate, PI/2)
 		else:
 			# Move the cursor
 			var cursor_move = Vector3(

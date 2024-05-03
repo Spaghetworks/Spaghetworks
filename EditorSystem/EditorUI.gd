@@ -21,6 +21,8 @@ func hide_interaction():
 	interaction.visible = false
 
 func add_interaction(ui):
+	if interaction_list.get_children().size() != 0:
+		interaction_list.add_child(HSeparator.new())
 	interaction_list.add_child(ui)
 
 func clear_interaction():

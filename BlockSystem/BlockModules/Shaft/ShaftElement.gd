@@ -15,7 +15,10 @@ var offset = 0
 var connected_element_a
 var connected_element_b
 var springs = []
-var constraints = []
+var a_constraints = []
+var b_constraints = []
+var alignment
+var alignment_dirty = true
 
 var rebuild_this_frame
 
@@ -61,21 +64,49 @@ func attach(shaft_body):
 	body = shaft_body
 	# Connect signals
 	body.state_updated.connect(on_state_updated)
+	alignment_dirty = true
 
 func add_spring(spring):
 	springs.append(spring)
 	print("spring!" + str(springs.size()))
 
-func add_constraint(constraint):
-	constraints.append(constraint)
+func add_a_constraint(constraint):
+	a_constraints.append(constraint)
+
+func add_b_constraint(constraint):
+	b_constraints.append(constraint)
+
+func get_alignment():
+	if alignment_dirty:
+		alignment = (get_parent().global_transform.basis * axis).dot(get_node("../..").global_transform.basis * body.principal_axis)
+		alignment_dirty = false
+	return alignment
 
 func get_position():
-	return body.position * (get_parent().global_transform.basis * axis).dot(get_node("../..").global_transform.basis * body.principal_axis) + offset
+	return body.position * get_alignment() + offset
 
 func get_velocity():
-	return body.velocity * (get_parent().global_transform.basis * axis).dot(get_node("../..").global_transform.basis * body.principal_axis)
+	return body.velocity * get_alignment()
 
-func on_state_updated(pos, vel):
+func get_acceleration():
+	return body.acceleration * get_alignment()
+
+func get_sub_pos():
+	return body.sub_pos * get_alignment() + offset
+
+func get_sub_vel():
+	return body.sub_vel * get_alignment()
+
+func free_sub_vel(delta):
+	return (2.0 / delta * body.velocity + body.acceleration + body.sub_acc) * get_alignment()
+
+func get_sub_acc():
+	return body.sub_acc * get_alignment()
+
+func add_torque(torque):
+	body.add_torque(torque * get_alignment())
+
+func on_state_updated(_pos, _vel):
 #	print((get_parent().global_transform * axis).dot(body.principal_axis))
 	state_updated.emit(get_position(), get_velocity())
 

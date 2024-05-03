@@ -1,0 +1,133 @@
+{
+	"name":"block_constant_vel_1",
+	"display_name":"Constant Velocity Source 1",
+	"category":"Shaft Power",
+	"mass":0.78,
+	"visual_mesh":
+	{
+		"name":"generator_none"
+	},
+	"collision_mesh":
+	{
+		"name":"generator_cuboid",
+		"dimensions":[2,3,2]
+	},
+	"modules":
+	[
+		{
+			"name":"Socket",
+			"params":
+			{
+				"socket_name":"output_socket",
+				"socket_type":"shaft_1",
+				"position":[0.0,0.15,0.0]
+			}
+		},
+
+		{
+			"name":"Shaft/ShaftElement",
+			"params":
+			{
+				"element_name":"constvel",
+				"moment":975E-6,
+				"sockets":[],
+				"axis":[0,1,0]
+			}
+		},
+
+		{
+			"name":"Shaft/ShaftElement",
+			"params":
+			{
+				"element_name":"internal",
+				"moment":975E-6,
+				"sockets":[],
+				"axis":[0,1,0]
+			}
+		},
+
+		{
+			"name":"Shaft/ShaftElement",
+			"params":
+			{
+				"element_name":"output",
+				"moment":975E-6,
+				"sockets":["output_socket"],
+				"axis":[0,1,0]
+			}
+		},
+
+		{
+			"name":"Shaft/ShaftMesh",
+			"params":
+			{
+				"element_name":"constvel",
+				"mesh_name":"Blocks/Shaft/block_barrel_1.obj",
+				"offset":[0,-0.1,0],
+			}
+		},
+
+		{
+			"name":"Shaft/ShaftMesh",
+			"params":
+			{
+				"element_name":"internal",
+				"mesh_name":"Blocks/Shaft/block_barrel_1.obj"
+			}
+		},
+
+		{
+			"name":"Shaft/ShaftMesh",
+			"params":
+			{
+				"element_name":"output",
+				"mesh_name":"Blocks/Shaft/block_barrel_1.obj",
+				"offset":[0,0.1,0],
+			}
+		},
+
+		{
+			"name":"Shaft/ShaftConstraint",
+			"params":
+			{
+				"type":"constantvel",
+				"constraint_name":"constantvel",
+				"elements":["constvel"],
+				"velocity":10.0,
+			}
+		},
+
+		{
+			"name":"Shaft/ShaftSpring",
+			"params":
+			{
+				"spring_name":"spring",
+				"elements":["internal","output"],
+				"spring_constant":1000,
+				"spring_preload":0
+			}
+		},
+
+		{
+			"name":"Shaft/ShaftDamper",
+			"params":
+			{
+				"damper_name":"damper",
+				"element_names":["internal","output"],
+				"damping":1,
+			}
+		},
+
+		{
+			"name":"Shaft/ShaftConstraint",
+			"params":
+			{
+				"type":"proportional",
+				"ratio": [1,1],
+				"breaking_force":100.0,
+				"constraint_name":"clutch",
+				"elements":["constvel","internal"]
+			}
+		},
+	]
+}

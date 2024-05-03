@@ -1,0 +1,21 @@
+[remap]
+
+importer="wavefront_obj"
+importer_version=1
+type="Mesh"
+uid="uid://ccnirbw7bcxjk"
+path="res://.godot/imported/block_barrel_1.obj-4380d0de0caaa064b156907d76a7e8ad.mesh"
+
+[deps]
+
+files=["res://.godot/imported/block_barrel_1.obj-4380d0de0caaa064b156907d76a7e8ad.mesh"]
+
+source_file="res://BlockSystem/Blocks/Shaft/block_barrel_1.obj"
+dest_files=["res://.godot/imported/block_barrel_1.obj-4380d0de0caaa064b156907d76a7e8ad.mesh", "res://.godot/imported/block_barrel_1.obj-4380d0de0caaa064b156907d76a7e8ad.mesh"]
+
+[params]
+
+generate_tangents=true
+scale_mesh=Vector3(1, 1, 1)
+offset_mesh=Vector3(0, 0, 0)
+optimize_mesh=true

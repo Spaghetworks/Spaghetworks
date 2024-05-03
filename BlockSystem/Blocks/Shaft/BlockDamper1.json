@@ -1,6 +1,6 @@
 {
-	"name":"block_spring_1_3",
-	"display_name":"Small Spring size 1",
+	"name":"block_damper_1",
+	"display_name":"Damper 1",
 	"category":"Shaft Power",
 	"mass":0.78,
 	"visual_mesh":"Blocks/Shaft/block_spring_1_3.obj",
@@ -35,7 +35,7 @@
 			"name":"Shaft/ShaftElement",
 			"params":
 			{
-				"element_name":"spring_a",
+				"element_name":"shaft_a",
 				"moment":975E-6,
 				"sockets":["socket_end_a"],
 				"axis":[0,1,0]
@@ -46,7 +46,7 @@
 			"name":"Shaft/ShaftElement",
 			"params":
 			{
-				"element_name":"spring_b",
+				"element_name":"shaft_b",
 				"moment":975E-6,
 				"sockets":["socket_end_b"],
 				"axis":[0,1,0]
@@ -54,12 +54,12 @@
 		},
 
 		{
-			"name":"Shaft/ShaftSpring",
+			"name":"Shaft/ShaftDamper",
 			"params":
 			{
-				"spring_name":"spring",
-				"elements":["spring_a","spring_b"],
-				"spring_constant":780E-3,
+				"damper_name":"damper",
+				"element_names":["shaft_a","shaft_b"],
+				"damping":1,
 			}
 		},
 	]

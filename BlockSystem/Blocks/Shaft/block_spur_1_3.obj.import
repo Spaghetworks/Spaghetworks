@@ -1,0 +1,21 @@
+[remap]
+
+importer="wavefront_obj"
+importer_version=1
+type="Mesh"
+uid="uid://do0f5ecjtaby7"
+path="res://.godot/imported/block_spur_1_3.obj-9bfe2d7eb53248f4ef0ecc1189375ae1.mesh"
+
+[deps]
+
+files=["res://.godot/imported/block_spur_1_3.obj-9bfe2d7eb53248f4ef0ecc1189375ae1.mesh"]
+
+source_file="res://BlockSystem/Blocks/Shaft/block_spur_1_3.obj"
+dest_files=["res://.godot/imported/block_spur_1_3.obj-9bfe2d7eb53248f4ef0ecc1189375ae1.mesh", "res://.godot/imported/block_spur_1_3.obj-9bfe2d7eb53248f4ef0ecc1189375ae1.mesh"]
+
+[params]
+
+generate_tangents=true
+scale_mesh=Vector3(1, 1, 1)
+offset_mesh=Vector3(0, 0, 0)
+optimize_mesh=true
