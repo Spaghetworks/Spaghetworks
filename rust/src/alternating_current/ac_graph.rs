@@ -152,10 +152,10 @@ impl AcSystem {
             vertex_type: VertexType::Resistor(ResistorData {
                 resistance: (0 as RealType),
             }),
-            connections: Vec::new(),
+            connections: Vec::with_capacity(2),
             constraints: ConstraintList::default(),
         });
-
+        self.components.push(resistor.clone().into());
         resistor
     }
 
