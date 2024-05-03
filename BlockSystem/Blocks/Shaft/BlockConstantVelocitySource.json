@@ -109,6 +109,16 @@
 		},
 
 		{
+			"name":"Shaft/ShaftDamper",
+			"params":
+			{
+				"damper_name":"damper",
+				"element_names":["internal","output"],
+				"damping":1,
+			}
+		},
+
+		{
 			"name":"Shaft/ShaftConstraint",
 			"params":
 			{

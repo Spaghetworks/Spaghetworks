@@ -98,13 +98,13 @@ func get_sub_vel():
 	return body.sub_vel * get_alignment()
 
 func free_sub_vel(delta):
-	return get_alignment() * (2.0 / delta * body.velocity + body.acceleration + body.sub_acc)
+	return (2.0 / delta * body.velocity + body.acceleration + body.sub_acc) * get_alignment()
 
 func get_sub_acc():
 	return body.sub_acc * get_alignment()
 
 func add_torque(torque):
-	body.add_torque(torque )#* get_alignment())
+	body.add_torque(torque * get_alignment())
 
 func on_state_updated(_pos, _vel):
 #	print((get_parent().global_transform * axis).dot(body.principal_axis))

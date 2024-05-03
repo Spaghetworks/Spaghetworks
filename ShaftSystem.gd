@@ -53,13 +53,17 @@ func flush_rebuild_requests():
 			match constraint.type:
 				"proportional":
 					for subconstraint in constraint.element_a.body.a_constraints:
-						constraint_matrix[index * size + constraints.find(subconstraint)] += 1.0 / constraint.element_a.body.moment * constraint.ratio[0] * subconstraint.ratio[0]
+						constraint_matrix[index * size + constraints.find(subconstraint)] +=  \
+							1.0 / constraint.element_a.body.moment * constraint.ratio[0] * subconstraint.ratio[0] * constraint.element_a.get_alignment() * subconstraint.element_a.get_alignment()
 					for subconstraint in constraint.element_a.body.b_constraints:
-						constraint_matrix[index * size + constraints.find(subconstraint)] -= 1.0 / constraint.element_a.body.moment * constraint.ratio[0] * subconstraint.ratio[1]
+						constraint_matrix[index * size + constraints.find(subconstraint)] -=  \
+							1.0 / constraint.element_a.body.moment * constraint.ratio[0] * subconstraint.ratio[1] * constraint.element_a.get_alignment() * subconstraint.element_b.get_alignment()
 					for subconstraint in constraint.element_b.body.a_constraints:
-						constraint_matrix[index * size + constraints.find(subconstraint)] -= 1.0 / constraint.element_b.body.moment * constraint.ratio[1] * subconstraint.ratio[0]
+						constraint_matrix[index * size + constraints.find(subconstraint)] -=  \
+							1.0 / constraint.element_b.body.moment * constraint.ratio[1] * subconstraint.ratio[0] * constraint.element_b.get_alignment() * subconstraint.element_a.get_alignment()
 					for subconstraint in constraint.element_b.body.b_constraints:
-						constraint_matrix[index * size + constraints.find(subconstraint)] += 1.0 / constraint.element_b.body.moment * constraint.ratio[1] * subconstraint.ratio[1]
+						constraint_matrix[index * size + constraints.find(subconstraint)] +=  \
+							1.0 / constraint.element_b.body.moment * constraint.ratio[1] * subconstraint.ratio[1] * constraint.element_b.get_alignment() * subconstraint.element_b.get_alignment()
 				"constantvel":
 					for subconstraint in constraint.element_a.body.a_constraints:
 						constraint_matrix[index * size + constraints.find(subconstraint)] += 1.0 / constraint.element_a.body.moment
