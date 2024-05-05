@@ -12,6 +12,7 @@ func _ready():
 			add_category(block.get_meta("category"))
 		var button = Button.new()
 		button.text = block.get_meta("display_name")
+		button.focus_mode = Control.FOCUS_NONE
 		button.button_down.connect(_on_block_selected.bind(block.get_meta("name")))
 		categories[block.get_meta("category")].add_child(button)
 
