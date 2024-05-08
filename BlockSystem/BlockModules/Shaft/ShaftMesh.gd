@@ -11,10 +11,10 @@ var first_time
 func initialize(params):
 	var file_mesh = load("res://BlockSystem/" + params["mesh_name"])
 	set_mesh(file_mesh)
-	get_parent().add_mesh(file_mesh)
-	element_name = params["element_name"]
 	if params.has("offset"):
 		position = Vector3(params["offset"][0],params["offset"][1],params["offset"][2])
+	get_parent().add_mesh([file_mesh, position])
+	element_name = params["element_name"]
 
 func _enter_tree():
 	first_time = Time.get_unix_time_from_system()

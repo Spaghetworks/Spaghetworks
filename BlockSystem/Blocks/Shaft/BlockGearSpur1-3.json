@@ -8,10 +8,17 @@
 		"name":"generator_none"
 	},
 	"collision_mesh":
-	{
-		"name":"generator_cuboid",
-		"dimensions":[6,1,6]
-	},
+	[
+		{
+			"name":"generator_cuboid",
+			"dimensions":[6,1,6],
+		},
+		{
+			"name":"generator_cuboid",
+			"dimensions":[2,1,2],
+			"offset":[-0.4,0,0]
+		}
+	],
 	"modules":
 	[
 		{

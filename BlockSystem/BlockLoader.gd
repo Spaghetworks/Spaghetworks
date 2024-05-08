@@ -42,49 +42,26 @@ func _ready():
 		#  Create a new scene with a MeshInstance, Area3D, and CollisionShape.
 		var block = block_template.new()
 		block.add_child(Area3D.new())
-		block.get_child(0).add_child(CollisionShape3D.new())
 		block.name = "MeshInstance3D"
 		block.get_child(0).name = "Area3D"
-		block.get_child(0).get_child(0).name = "CollisionShape3D"
-		#  Configure MeshInstance and CollisionShape
-		if typeof(block_data["visual_mesh"]) == TYPE_STRING:
-			# Asset path
-			var mesh = load(systemBaseDirectory + "/" + block_data["visual_mesh"])
-			print(mesh)
-			block.set_mesh(mesh)
-			block.add_mesh(mesh)
-		else:
-			# Generator
-			print(block_data["visual_mesh"]["name"])
-			match block_data["visual_mesh"]["name"]:
-				"generator_cuboid":
-					var box_shape = BoxMesh.new()
-					var dimensions = block_data["visual_mesh"]["dimensions"]
-					dimensions = Vector3(dimensions[0],dimensions[1],dimensions[2])
-					dimensions /= 10
-					box_shape.set_size(dimensions)
-					block.set_mesh(box_shape)
-					block.add_mesh(box_shape)
-				"generator_none":
-					pass
 		
-		if typeof(block_data["collision_mesh"]) == TYPE_STRING:
-			# Asset path
-			print("COLLISION ASSETS NOT YET HANDLED")
+		#  Configure MeshInstance and CollisionShape
+		if typeof(block_data["visual_mesh"]) == TYPE_ARRAY:
+			# Multi-mesh
+			for mesh_data in block_data["visual_mesh"]:
+				assign_mesh(block, mesh_data)
 		else:
-			# Generator
-			print(block_data["collision_mesh"]["name"])
-			match block_data["collision_mesh"]["name"]:
-				"generator_cuboid":
-					var box_shape = BoxShape3D.new()
-					var dimensions = block_data["collision_mesh"]["dimensions"]
-					dimensions = Vector3(dimensions[0],dimensions[1],dimensions[2])
-					dimensions /= 10
-					box_shape.set_size(dimensions)
-					block.get_child(0).get_child(0).set_shape(box_shape)
-#				"generator_cuboid_multi":
-#					for cuboid in block_data["collision_mesh"]["shapes"]:
-#						pass
+			# Single mesh
+			assign_mesh(block, block_data["visual_mesh"])
+		
+		if typeof(block_data["collision_mesh"]) == TYPE_ARRAY:
+			# Multi-collider
+			for collider in block_data["collision_mesh"]:
+				assign_collision(block, collider)
+		else:
+			# Single collider
+			assign_collision(block, block_data["collision_mesh"])
+		
 		#  Add all modules
 		if block_data.has("modules"):
 			print("Adding modules")
@@ -110,3 +87,47 @@ func _ready():
 		block_registered.emit(block_data["name"], block_data["display_name"])
 	print("Loading done.")
 	loaded = true
+
+func assign_mesh(block, mesh_data):
+	if typeof(mesh_data) == TYPE_STRING:
+	# Asset path
+		var mesh = load(systemBaseDirectory + "/" + mesh_data)
+		print(mesh)
+		block.set_mesh(mesh)
+		block.add_mesh([mesh, Vector3.ZERO])
+	else:
+	# Generator
+		print(mesh_data["name"])
+		match mesh_data["name"]:
+			"generator_cuboid":
+				var box_shape = BoxMesh.new()
+				var dimensions = mesh_data["dimensions"]
+				dimensions = Vector3(dimensions[0],dimensions[1],dimensions[2])
+				dimensions /= 10
+				box_shape.set_size(dimensions)
+				block.set_mesh(box_shape)
+				block.add_mesh([box_shape, Vector3.ZERO])
+			"generator_none":
+				pass
+
+func assign_collision(block, collider):
+	var shape
+	if typeof(collider) == TYPE_STRING:
+	# Asset path
+		print("COLLISION ASSETS NOT YET HANDLED")
+	elif typeof(collider) == TYPE_DICTIONARY:
+	# Generator
+		print(collider["name"])
+		match collider["name"]:
+			"generator_cuboid":
+				shape = BoxShape3D.new()
+				var dimensions = collider["dimensions"]
+				dimensions = Vector3(dimensions[0],dimensions[1],dimensions[2])
+				dimensions /= 10
+				shape.set_size(dimensions)
+	var collision = CollisionShape3D.new()
+	collision.set_shape(shape)
+	if collider.has("offset"):
+		collision.position = Vector3(collider["offset"][0],collider["offset"][1],collider["offset"][2])
+	block.get_child(0).add_child(collision)
+	block.add_collision(collision)

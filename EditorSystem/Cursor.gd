@@ -129,14 +129,19 @@ func _on_selected_block_changed(block_name):
 	print("block changed to " + block_name)
 	hand = get_node("/root/BlockLoader").blocks[block_name]
 #	print(hand.get_node("Area3D/CollisionShape3D"))
-	place_area.get_child(0).set_shape(hand.get_node("Area3D/CollisionShape3D").get_shape())
+	for node in place_area.get_children():
+		node.queue_free()
+	for collision in hand.get_all_collisions():
+		place_area.add_child(collision.duplicate())
+#	place_area.get_child(0).set_shape(hand.get_node("Area3D/CollisionShape3D").get_shape())
 	for node in cursor_mesh.get_children():
 		node.queue_free()
 	for mesh in hand.get_all_meshes():
 		var instance = MeshInstance3D.new()
-		instance.set_mesh(mesh)
+		instance.set_mesh(mesh[0])
 		var mat = StandardMaterial3D.new()
 		mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 		instance.set_surface_override_material(0, mat)
 		cursor_mesh.add_child(instance)
+		instance.position = mesh[1]
 #	cursor_mesh.set_mesh(hand.get_all_meshes())
