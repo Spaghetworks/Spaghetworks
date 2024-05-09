@@ -28,7 +28,8 @@ static func to_world(proto_construct):
 #		moment += block_moment
 		mass += block_mass
 		# Move the block's CollisionShape3D to the RigidBody preserving transform
-		block.get_node("Area3D/CollisionShape3D").reparent(construct, true)
+		for node in block.get_node("Area3D").get_children():
+			node.reparent(construct, true)
 		# Free the Area3D
 		block.get_node("Area3D").queue_free()
 	# Correct the moment of inertia by parallel axis theorem
