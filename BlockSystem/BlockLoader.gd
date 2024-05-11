@@ -112,6 +112,10 @@ func assign_mesh(block, mesh_data):
 
 func assign_collision(block, collider):
 	var shape
+	var new_aabb
+	var collision = CollisionShape3D.new()
+	if collider.has("offset"):
+		collision.position = Vector3(collider["offset"][0],collider["offset"][1],collider["offset"][2])
 	if typeof(collider) == TYPE_STRING:
 	# Asset path
 		print("COLLISION ASSETS NOT YET HANDLED")
@@ -125,9 +129,8 @@ func assign_collision(block, collider):
 				dimensions = Vector3(dimensions[0],dimensions[1],dimensions[2])
 				dimensions /= 10
 				shape.set_size(dimensions)
-	var collision = CollisionShape3D.new()
+				new_aabb = AABB(-dimensions / 2 + collision.position, dimensions)
 	collision.set_shape(shape)
-	if collider.has("offset"):
-		collision.position = Vector3(collider["offset"][0],collider["offset"][1],collider["offset"][2])
 	block.get_child(0).add_child(collision)
 	block.add_collision(collision)
+	block.merge_aabb(new_aabb)

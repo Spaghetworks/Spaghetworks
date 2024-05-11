@@ -7,6 +7,13 @@ signal ui_provided
 
 @export var all_meshes:Array
 @export var all_collisions:Array
+@export var aabb:AABB
+
+func merge_aabb(new_aabb):
+	if aabb == null:
+		aabb = AABB()
+	aabb = aabb.merge(new_aabb)
+#	print(aabb)
 
 func add_mesh(new_mesh):
 	all_meshes.append(new_mesh)

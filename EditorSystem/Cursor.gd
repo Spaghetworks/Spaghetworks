@@ -12,6 +12,8 @@ var editor_ui # root UI object
 var collider_dirty = true # signals to check obstruction on next frame
 var rotate_mode = false # should directional inputs be translation or rotation?
 var interacting # block which interaction menu is active
+var automove = true # advance the cursor by the size of the thing being placed
+var place_aabb
 
 func _process(_delta):
 	if(collider_dirty):
@@ -48,14 +50,29 @@ func _unhandled_input(event):
 			var new_block = hand.duplicate(7)
 			world.add_child(new_block)
 			new_block.global_transform = cursor_mesh.global_transform
+			
+			var move = Vector3()
+			move[abs(camera_focus.global_transform.basis.z).max_axis_index()] = -sign(camera_focus.global_transform.basis.z[abs(camera_focus.global_transform.basis.z).max_axis_index()])
+#			move *= camera_focus.global_transform * (place_aabb.size)
+			move *= (place_area.transform * place_aabb).size.snapped(Vector3(0.1,0.1,0.1))
+			print(move)
+			transform.origin += move
 	
 	elif(event.is_action_pressed("EditorDelete")):
 		if(delete_area.has_overlapping_areas()):
 			# Delete the thing under the cursor
 			print("deleting item")
-			delete_area.get_overlapping_areas()[0].get_parent().queue_free()
+			var block = delete_area.get_overlapping_areas()[0].get_parent()
 			collider_dirty = true
 			hide_interaction()
+			
+			var move = Vector3()
+			move[abs(camera_focus.global_transform.basis.z).max_axis_index()] = -sign(camera_focus.global_transform.basis.z[abs(camera_focus.global_transform.basis.z).max_axis_index()])
+#			move *= camera_focus.global_transform * (place_aabb.size)
+			move *= (place_area.transform * block.aabb).size.snapped(Vector3(0.1,0.1,0.1))
+			print(move)
+			transform.origin -= move
+			block.queue_free()
 		else:
 			print("nothing to delete")
 	
@@ -144,4 +161,6 @@ func _on_selected_block_changed(block_name):
 		instance.set_surface_override_material(0, mat)
 		cursor_mesh.add_child(instance)
 		instance.position = mesh[1]
+	print(hand.aabb.size)
+	place_aabb = hand.aabb
 #	cursor_mesh.set_mesh(hand.get_all_meshes())
