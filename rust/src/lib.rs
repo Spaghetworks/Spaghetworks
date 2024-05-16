@@ -1,9 +1,9 @@
 use godot::prelude::*;
 
-struct MyExtension;
+struct SpaghetworksExtension;
 
 #[gdextension]
-unsafe impl ExtensionLibrary for MyExtension {}
+unsafe impl ExtensionLibrary for SpaghetworksExtension {}
 
 mod matrixsolver;
 pub use matrixsolver::MatrixSolver;

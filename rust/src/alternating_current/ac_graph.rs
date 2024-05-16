@@ -1,7 +1,11 @@
-use super::ac_graph_data::ResistorData;
-use super::ConstraintList;
+use std::collections::HashMap;
+
 use super::RealType;
 use super::VertexType;
+use super::{
+    ac_graph_data::{AcMeasurable, ResistorData},
+    Constraint,
+};
 use crate::util::{TypedInstanceId, Validatable};
 use godot::engine::Node;
 use godot::prelude::*;
@@ -12,16 +16,24 @@ use godot::prelude::*;
 pub struct AcVertex {
     base: Base<Node>,
 
+    up_to_date: bool,
     owner_system_id: TypedInstanceId<AcSystem>,
     vertex_type: VertexType,
     connections: Vec<AcConnection>,
-    constraints: ConstraintList,
+    constraints: Vec<Constraint>,
 }
 
-#[derive(Copy, Clone, Debug, Eq, PartialEq, Ord, PartialOrd, Hash)]
+#[derive(Copy, Clone, Debug, Eq, PartialEq, Ord, PartialOrd, Hash, GodotClass)]
+#[class(no_init)]
 pub struct AcConnection {
     node: TypedInstanceId<AcVertex>,
     component: TypedInstanceId<AcVertex>,
+}
+
+impl Validatable for AcConnection {
+    fn is_valid(&self) -> bool {
+        self.node.is_valid() && self.component.is_valid()
+    }
 }
 
 #[godot_api]
@@ -33,6 +45,10 @@ impl AcVertex {
     #[func]
     pub fn is_component(&self) -> bool {
         !matches!(self.vertex_type, VertexType::Node)
+    }
+
+    fn internal_mark_as_modified(&mut self) {
+        self.up_to_date = false;
     }
 
     /// Returns true if the connection was dropped. Returns false otherwise.
@@ -64,38 +80,35 @@ impl AcVertex {
         }
     }
 
-    #[doc(hidden)]
-    fn internal_try_drop_connection(&mut self, connection: &AcConnection) -> Result<(), ()> {
-        if let Some(index) = self.connections.iter().position(|x| x == connection) {
+    fn internal_try_drop_connection(&mut self, connection: AcConnection) -> Result<(), ()> {
+        if let Some(index) = self.connections.iter().position(|x| x == &connection) {
             self.connections.swap_remove(index);
             Ok(())
         } else {
             Err(())
         }
     }
+
+    fn internal_add_connection(&mut self, connection: AcConnection) {
+        debug_assert!(
+            (self.is_component() && connection.component == TypedInstanceId::from(self.to_gd()))
+                || (self.is_node() && connection.node == TypedInstanceId::from(self.to_gd()))
+        );
+        self.internal_mark_as_modified();
+        self.connections.push(connection);
+    }
 }
 
 impl Validatable for AcVertex {
     fn is_valid(&self) -> bool {
-        match self.vertex_type {
+        (match self.vertex_type {
             VertexType::Node => true,
             VertexType::Resistor(resistor_data) => {
-                if self.connections.len() == 2 {
-                    self.connections.iter().all(|c| c.component.is_valid())
-                        && resistor_data.resistance >= (0 as RealType)
-                } else {
-                    false
-                }
+                self.connections.len() == 2 && resistor_data.resistance >= (0 as RealType)
             }
-            VertexType::VoltageSource(_) => {
-                if self.connections.len() == 2 {
-                    self.connections.iter().all(|c| c.component.is_valid())
-                } else {
-                    false
-                }
-            }
+            VertexType::VoltageSource(_) => self.connections.len() == 2,
             VertexType::OtherComponent => true,
-        }
+        }) && self.connections.is_valid()
     }
 }
 
@@ -115,6 +128,7 @@ pub struct AcSystem {
     nodes: Vec<TypedInstanceId<AcVertex>>,
     components: Vec<TypedInstanceId<AcVertex>>,
     connections: Vec<AcConnection>,
+    measurable_to_id: HashMap<AcMeasurable, usize>,
 }
 
 #[godot_api]
@@ -125,6 +139,7 @@ impl INode for AcSystem {
             nodes: Vec::new(),
             components: Vec::new(),
             connections: Vec::new(),
+            measurable_to_id: HashMap::new(),
         }
     }
 }
@@ -135,10 +150,11 @@ impl AcSystem {
     pub fn create_node(&mut self) -> Gd<AcVertex> {
         let node = Gd::from_init_fn(|base| AcVertex {
             base,
+            up_to_date: true,
             owner_system_id: self.to_gd().into(),
             vertex_type: VertexType::Node,
             connections: Vec::new(),
-            constraints: ConstraintList::default(),
+            constraints: Vec::with_capacity(1),
         });
         self.nodes.push(node.clone().into());
         node
@@ -146,17 +162,35 @@ impl AcSystem {
 
     #[func]
     pub fn create_resistor(&mut self) -> Gd<AcVertex> {
-        let resistor = Gd::from_init_fn(|base| AcVertex {
-            base,
-            owner_system_id: self.to_gd().into(),
-            vertex_type: VertexType::Resistor(ResistorData {
-                resistance: (0 as RealType),
-            }),
-            connections: Vec::with_capacity(2),
-            constraints: ConstraintList::default(),
+        let mut resistor = self.create_node();
+        resistor.bind_mut().vertex_type = VertexType::Resistor(ResistorData {
+            resistance: (0 as RealType),
         });
-        self.components.push(resistor.clone().into());
         resistor
+    }
+
+    #[func]
+    pub fn create_connection(&mut self, mut node: Gd<AcVertex>, mut component: Gd<AcVertex>) {
+        let node_id = TypedInstanceId::from(node.clone());
+        let component_id = TypedInstanceId::from(component.clone());
+        let connection = AcConnection {
+            node: node_id,
+            component: component_id,
+        };
+
+        debug_assert!(self.nodes.contains(&node_id));
+        debug_assert!(self.components.contains(&component_id));
+
+        if !self.connections.contains(&connection) {
+            self.connections.push(connection);
+            let mut node = node.bind_mut();
+            let mut component = component.bind_mut();
+
+            node.connections.push(connection);
+            node.internal_mark_as_modified();
+            component.connections.push(connection);
+            node.internal_mark_as_modified();
+        }
     }
 
     /// Attempts to drop a connection, removing it from the internal connection list as well as the
@@ -174,10 +208,10 @@ impl AcSystem {
         let option_connection_index = self.connections.iter().position(|x| x == &connection);
 
         if let Some(connection_index) = option_connection_index {
-            let _ = node.bind_mut().internal_try_drop_connection(&connection);
+            let _ = node.bind_mut().internal_try_drop_connection(connection);
             let _ = component
                 .bind_mut()
-                .internal_try_drop_connection(&connection);
+                .internal_try_drop_connection(connection);
             self.components.swap_remove(connection_index);
         }
     }
@@ -214,7 +248,7 @@ impl AcSystem {
             if let Ok(mut connected_vertex) = connected_vertex_result {
                 let _ = connected_vertex
                     .bind_mut()
-                    .internal_try_drop_connection(connection);
+                    .internal_try_drop_connection(*connection);
             }
         }
         vertex.bind_mut().connections.clear();
@@ -223,3 +257,13 @@ impl AcSystem {
         }
     }
 }
+// TODO: Implement Kirchoff's Current Law in constraints
+// TODO: Implement resistance in constraints
+// TODO: Implement inductance in constraints
+// TODO: Implement capacitance in constraints
+// TODO: When a connection is added, modified, or removed, mark the vertices at both ends as modified.
+// TODO: Add a map from (vertices, or component properties, or connections) -> (index in measurable vector)
+// TODO: Auto-sync measurable vector layout to the map
+// TODO: Add a dynamic matrix to the system
+// TODO: Keep the matrix up to date with the constraints
+// TODO: Go from Matrix x Measurable = Zero Vector to finding Measurable from Matrix

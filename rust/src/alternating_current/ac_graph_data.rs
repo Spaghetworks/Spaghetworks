@@ -1,6 +1,7 @@
 use std::ops::{Add, Mul};
 
-use nalgebra::{Complex, DMatrixViewMut, Matrix2};
+use nalgebra::{Complex, Dyn, MatrixViewMut, U1};
+use num_traits::Zero;
 
 use super::{AcConnection, AcVertex, RealType};
 use crate::util::TypedInstanceId;
@@ -23,80 +24,14 @@ pub struct VoltageSourceData {
     pub voltage: Complex<RealType>,
 }
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub enum AcMeasurable {
     Node(TypedInstanceId<AcVertex>),
     Connection(AcConnection),
-    Constant(Complex<RealType>),
+    Constant,
 }
 
-#[derive(Clone, Copy, Debug)]
-pub enum AcMultiplier {
-    Zero,
-    Unit,
-    Scalar(RealType),
-    ScaledDerivative(RealType),
-    ScaledIntegral(RealType),
-    ScaleRotate(Complex<RealType>),
-    General(Matrix2<RealType>),
-}
-
-impl From<AcMultiplier> for Matrix2<RealType> {
-    fn from(value: AcMultiplier) -> Self {
-        match value {
-            AcMultiplier::Zero => Matrix2::zeros(),
-            AcMultiplier::Unit => Matrix2::identity(),
-            AcMultiplier::Scalar(scalar) => Matrix2::new_scaling(scalar),
-            AcMultiplier::ScaledDerivative(scalar) => {
-                Matrix2::new(0 as RealType, scalar, -scalar, 0 as RealType)
-            }
-            AcMultiplier::ScaledIntegral(scalar) => {
-                Matrix2::new(0 as RealType, -scalar, scalar, 0 as RealType)
-            }
-            AcMultiplier::ScaleRotate(complex) => {
-                Matrix2::new(complex.re, complex.im, -complex.im, complex.re)
-            }
-            AcMultiplier::General(matrix) => matrix,
-        }
-    }
-}
-
-impl Add<AcMultiplier> for AcMultiplier {
-    type Output = AcMultiplier;
-    fn add(self, rhs: AcMultiplier) -> Self::Output {
-        match (self, rhs) {
-            (AcMultiplier::Zero, _) => rhs,
-            (_, AcMultiplier::Zero) => self,
-            (AcMultiplier::Unit, AcMultiplier::Unit) => AcMultiplier::Scalar(2 as RealType),
-            (AcMultiplier::Unit, AcMultiplier::Scalar(rhs_real)) => {
-                AcMultiplier::Scalar(1 as RealType + rhs_real)
-            }
-            (AcMultiplier::Scalar(lhs_real), AcMultiplier::Unit) => {
-                AcMultiplier::Scalar(lhs_real + 1 as RealType)
-            }
-            (AcMultiplier::Scalar(lhs_real), AcMultiplier::Scalar(rhs_real)) => {
-                AcMultiplier::Scalar(lhs_real + rhs_real)
-            }
-            (
-                AcMultiplier::ScaledDerivative(lhs_real),
-                AcMultiplier::ScaledDerivative(rhs_real),
-            ) => AcMultiplier::ScaledDerivative(lhs_real + rhs_real),
-            (AcMultiplier::ScaledDerivative(lhs_real), AcMultiplier::ScaledIntegral(rhs_real)) => {
-                AcMultiplier::ScaledDerivative(lhs_real - rhs_real)
-            }
-            (AcMultiplier::ScaledIntegral(lhs_real), AcMultiplier::ScaledDerivative(rhs_real)) => {
-                AcMultiplier::ScaledIntegral(lhs_real - rhs_real)
-            }
-            (AcMultiplier::ScaledIntegral(lhs_real), AcMultiplier::ScaledIntegral(rhs_real)) => {
-                AcMultiplier::ScaledIntegral(lhs_real + rhs_real)
-            }
-            (AcMultiplier::ScaleRotate(lhs_complex), AcMultiplier::ScaleRotate(rhs_complex)) => {
-                AcMultiplier::ScaleRotate(lhs_complex + rhs_complex)
-            }
-            (lhs, rhs) => AcMultiplier::General(Matrix2::from(lhs) + Matrix2::from(rhs)),
-        }
-    }
-}
+pub type AcMultiplier = Complex<RealType>;
 
 #[derive(Debug)]
 pub struct ConstraintElement {
@@ -114,37 +49,37 @@ impl Mul<AcMultiplier> for AcMeasurable {
     }
 }
 
-impl Add<ConstraintElement> for ConstraintList {
-    type Output = ConstraintList;
+impl Add<ConstraintElement> for Constraint {
+    type Output = Constraint;
     fn add(mut self, rhs: ConstraintElement) -> Self::Output {
         self.elements.push(rhs);
         self
     }
 }
 
-impl Add<ConstraintList> for ConstraintList {
-    type Output = ConstraintList;
-    fn add(mut self, mut rhs: ConstraintList) -> Self::Output {
+impl Add<Constraint> for Constraint {
+    type Output = Constraint;
+    fn add(mut self, mut rhs: Constraint) -> Self::Output {
         self.elements.append(&mut rhs.elements);
         self
     }
 }
 
 #[derive(Debug, Default)]
-pub struct ConstraintList {
+pub struct Constraint {
     elements: Vec<ConstraintElement>,
 }
+
 pub type MeasurableMapping = fn(AcMeasurable) -> usize;
-impl ConstraintList {
+impl Constraint {
     pub fn compile_to(
         &mut self,
         mapping: MeasurableMapping,
-        out_view: &mut DMatrixViewMut<RealType>,
+        out_row_view: &mut MatrixViewMut<Complex<RealType>, U1, Dyn>,
     ) {
-        let (row_count, column_count) = out_view.shape();
-        assert!(row_count == 2);
+        let (_, column_count) = out_row_view.shape();
 
-        out_view.fill(0 as RealType);
+        out_row_view.fill(Complex::zero());
 
         if self.elements.is_empty() {
             return;
@@ -152,10 +87,8 @@ impl ConstraintList {
 
         for element in self.elements.iter() {
             let column = mapping(element.measurable);
-            assert!(column % 2 == 0);
-            assert!(column + 1 < column_count);
-            let mut section_view = out_view.view_range_mut(0..1, column..(column + 1));
-            section_view += Matrix2::from(element.multiplier);
+
+            out_row_view[(0, column)] = element.multiplier;
         }
     }
 }

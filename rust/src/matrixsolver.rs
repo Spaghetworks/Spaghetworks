@@ -28,7 +28,7 @@ impl MatrixSolver {
         let _matrix =
             OMatrix::from_row_iterator_generic(Dyn(matrix_size), Dyn(matrix_size), row_iter);
         let _decomp = SVD::new_unordered(_matrix.clone(), true, true);
-        Gd::from_init_fn(|base| MatrixSolver {
+        Gd::from_init_fn(|base| Self {
             base,
             size: _size,
             decomp: _decomp,
