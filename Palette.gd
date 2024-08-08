@@ -24,4 +24,4 @@ func add_category(category_name):
 	categories[category_name] = category.get_child(0)
 
 func _on_block_selected(block_name):
-	get_node("/root/CursorGlobals").change_selected_block(block_name)
+	get_node("/root/CursorGlobals").change_selected_block(block_name, true)

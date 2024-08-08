@@ -1,9 +1,10 @@
-[gd_scene load_steps=5 format=3 uid="uid://bl5igur7y2g8s"]
+[gd_scene load_steps=6 format=3 uid="uid://bl5igur7y2g8s"]
 
 [ext_resource type="Script" path="res://EditorSystem/EditorUI.gd" id="1_avofj"]
 [ext_resource type="Script" path="res://EditorSystem/ControlHints.gd" id="2_mrnho"]
 [ext_resource type="Script" path="res://Palette.gd" id="2_r11f3"]
 [ext_resource type="Script" path="res://StatMonitor.gd" id="3_bua5r"]
+[ext_resource type="PackedScene" uid="uid://y1r6djf2dq37" path="res://ToggleButton.tscn" id="5_yhok4"]
 
 [node name="EditorUI" type="Control"]
 layout_mode = 3
@@ -42,33 +43,6 @@ script = ExtResource("3_bua5r")
 base_string = "Shafts: "
 stat_name = "shaft_count"
 
-[node name="InteractionMenu" type="Panel" parent="."]
-layout_mode = 1
-anchors_preset = 11
-anchor_left = 1.0
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = -244.0
-grow_horizontal = 0
-grow_vertical = 2
-focus_mode = 1
-
-[node name="VBoxContainer" type="VBoxContainer" parent="InteractionMenu"]
-layout_mode = 1
-anchors_preset = 10
-anchor_right = 1.0
-grow_horizontal = 2
-
-[node name="Label" type="Label" parent="InteractionMenu/VBoxContainer"]
-layout_mode = 2
-text = "Block Parameters"
-
-[node name="HSeparator" type="HSeparator" parent="InteractionMenu/VBoxContainer"]
-layout_mode = 2
-
-[node name="VBoxContainer" type="VBoxContainer" parent="InteractionMenu/VBoxContainer"]
-layout_mode = 2
-
 [node name="Panel3" type="Panel" parent="."]
 layout_mode = 1
 offset_right = 300.0
@@ -95,5 +69,76 @@ text = "Go To Sim"
 layout_mode = 2
 script = ExtResource("2_mrnho")
 
+[node name="VBoxContainer2" type="VBoxContainer" parent="."]
+custom_minimum_size = Vector2(256, 0)
+layout_mode = 1
+anchors_preset = 11
+anchor_left = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -35.0
+grow_horizontal = 0
+grow_vertical = 2
+
+[node name="Panel" type="Panel" parent="VBoxContainer2"]
+custom_minimum_size = Vector2(0, 70)
+layout_mode = 2
+
+[node name="HFlowContainer" type="HFlowContainer" parent="VBoxContainer2/Panel"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 31.0
+grow_horizontal = 2
+
+[node name="Automove" parent="VBoxContainer2/Panel/HFlowContainer" instance=ExtResource("5_yhok4")]
+layout_mode = 2
+button_pressed = true
+text = "Automove"
+
+[node name="Select" parent="VBoxContainer2/Panel/HFlowContainer" instance=ExtResource("5_yhok4")]
+layout_mode = 2
+text = "Select"
+
+[node name="Copy" type="Button" parent="VBoxContainer2/Panel/HFlowContainer"]
+layout_mode = 2
+disabled = true
+text = "Copy"
+
+[node name="Cut" type="Button" parent="VBoxContainer2/Panel/HFlowContainer"]
+layout_mode = 2
+disabled = true
+text = "Cut"
+
+[node name="Paste" type="Button" parent="VBoxContainer2/Panel/HFlowContainer"]
+layout_mode = 2
+text = "Paste"
+
+[node name="InteractionMenu" type="Panel" parent="VBoxContainer2"]
+layout_mode = 2
+size_flags_vertical = 3
+focus_mode = 1
+
+[node name="VBoxContainer" type="VBoxContainer" parent="VBoxContainer2/InteractionMenu"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+grow_horizontal = 2
+
+[node name="Label" type="Label" parent="VBoxContainer2/InteractionMenu/VBoxContainer"]
+layout_mode = 2
+text = "Block Parameters"
+
+[node name="HSeparator" type="HSeparator" parent="VBoxContainer2/InteractionMenu/VBoxContainer"]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="VBoxContainer2/InteractionMenu/VBoxContainer"]
+layout_mode = 2
+
 [connection signal="pressed" from="Panel3/Control/Top-Left Buttons/Restart Editor" to="." method="_on_reload_pressed"]
 [connection signal="pressed" from="Panel3/Control/Top-Left Buttons/Go To Sim" to="." method="_on_to_sim_pressed"]
+[connection signal="toggled" from="VBoxContainer2/Panel/HFlowContainer/Automove" to="." method="_on_automove_toggled"]
+[connection signal="toggled" from="VBoxContainer2/Panel/HFlowContainer/Select" to="." method="_on_select_toggled"]
+[connection signal="pressed" from="VBoxContainer2/Panel/HFlowContainer/Copy" to="." method="_on_copy_pressed"]
+[connection signal="pressed" from="VBoxContainer2/Panel/HFlowContainer/Cut" to="." method="_on_cut_pressed"]
+[connection signal="pressed" from="VBoxContainer2/Panel/HFlowContainer/Paste" to="." method="_on_paste_pressed"]
