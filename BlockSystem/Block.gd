@@ -38,3 +38,21 @@ func request_ui():
 
 func provide_ui(ui):
 	ui_provided.emit(ui)
+
+func serialize_modules():
+	var data = []
+	for module in get_children():
+		if module.has_method("serialize"):
+			data.append(module.serialize())
+	return data
+
+func deserialize_modules(data):
+	if data.size() > 0:
+		for module in data:
+			get_module(module["name"]).deserialize(module)
+
+func get_module(module_name):
+	for module in get_children():
+		if module.name == module_name:
+			return module
+	return null

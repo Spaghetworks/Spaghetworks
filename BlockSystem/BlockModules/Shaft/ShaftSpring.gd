@@ -77,3 +77,14 @@ func _on_spring_preload_changed(text):
 
 func _on_ui_requested():
 	get_parent().provide_ui(ui)
+	
+func serialize():
+	return {
+		"name" : name,
+		"spring_constant" : spring_constant,
+		"spring_preload" : spring_preload
+	}
+
+func deserialize(data):
+	spring_constant = data["spring_constant"]
+	spring_preload = data["spring_preload"]

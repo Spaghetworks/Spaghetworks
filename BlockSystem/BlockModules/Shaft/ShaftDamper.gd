@@ -27,3 +27,12 @@ func get_torque(body):
 
 func get_sub_torque(body):
 	return -damping * (element_a.get_sub_vel() - element_b.get_sub_vel()) * (1 if body == element_a.body else -1)
+
+func serialize():
+	return {
+		"name" : name,
+		"damping" : damping
+	}
+
+func deserialize(data):
+	damping = data["damping"]

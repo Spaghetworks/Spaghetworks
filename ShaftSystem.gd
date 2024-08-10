@@ -13,6 +13,7 @@ var constraints
 var error = 0
 
 func _ready():
+	owner = get_parent()
 	var test = MatrixSolver.create(2, PackedFloat64Array([2,-1,-1,2]))
 	print(test.solve(PackedFloat64Array([-20,0])))
 	print(test.solve_elided(PackedFloat64Array([-20,10]), PackedInt64Array([0])))

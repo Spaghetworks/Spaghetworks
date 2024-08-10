@@ -5,10 +5,14 @@ signal select_toggled
 signal copy_requested
 signal cut_requested
 signal paste_requested
+signal save_or_load_requested
 
 var statemachine
 @onready var interaction = $VBoxContainer2/InteractionMenu
 @onready var interaction_list = $VBoxContainer2/InteractionMenu/VBoxContainer/VBoxContainer
+@onready var file_dialog = $FileDialog
+const construct_dir = "user://Constructs"
+var file_dialog_init = false
 
 func _ready():
 	statemachine = get_node("/root/SceneStateMachine")
@@ -63,3 +67,26 @@ func force_UI(param, state):
 		"automove":
 			pass
 	pass
+
+func init_file_dialog():
+	# Check for save dir exists
+	if !DirAccess.dir_exists_absolute(construct_dir):
+		DirAccess.make_dir_absolute(construct_dir)
+	file_dialog.root_subfolder = construct_dir
+
+func _on_save_pressed():
+	if !file_dialog_init:
+		init_file_dialog()
+	# Open dialog in save mode
+	file_dialog.file_mode = file_dialog.FILE_MODE_SAVE_FILE
+	file_dialog.visible = true
+
+func _on_load_pressed():
+	if !file_dialog_init:
+		init_file_dialog()
+	# Open dialog in load mode
+	file_dialog.file_mode = file_dialog.FILE_MODE_OPEN_FILE
+	file_dialog.visible = true
+
+func _on_file_dialog_file_selected(path):
+	save_or_load_requested.emit(path, file_dialog.file_mode)

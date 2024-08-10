@@ -47,3 +47,12 @@ func assemble_ui():
 	
 	ui.get_child(1).add_child(line[0])
 	ui.get_child(1).add_child(line[1])
+
+func serialize():
+	return {
+		"name" : name,
+		"torque" : torque
+	}
+
+func deserialize(data):
+	torque = data["torque"]

@@ -79,3 +79,22 @@ func assemble_ui():
 
 func _on_ui_requested():
 	get_parent().provide_ui(ui)
+
+func serialize():
+	var data = {
+		"name" : name,
+		"type" : type,
+	}
+	match type:
+		"proportional":
+			data["breaking_force"] = breaking_force
+		"constantvel":
+			data["velocity"] = velocity
+	return data
+
+func deserialize(data):
+	match data["type"]:
+		"proportional":
+			breaking_force = data["breaking_force"]
+		"constantvel":
+			velocity = data["velocity"]
