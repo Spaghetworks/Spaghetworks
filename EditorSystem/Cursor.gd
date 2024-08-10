@@ -225,8 +225,9 @@ func _on_copy_requested():
 	for child in clipboard.get_children():
 		child.queue_free()
 	for block in selected_blocks:
-		clipboard.add_child(block.duplicate(7))
-		block.owner = clipboard
+		var block_copy = block.duplicate(7)
+		clipboard.add_child(block_copy)
+		block_copy.position = block.global_position - (selection_cube.global_position * 10).floor() / 10
 
 func _on_cut_requested():
 	_on_copy_requested()
