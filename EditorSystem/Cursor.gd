@@ -77,14 +77,12 @@ func _unhandled_input(event):
 						world.add_child(new_block)
 						new_block.global_transform = cursor_mesh.global_transform
 						new_block.transform *= block.transform
-						new_block.owner = world
 				else:
 					# Place the thing in hand
 					print("placing item")
 					var new_block = hand.duplicate(7)
 					world.add_child(new_block)
 					new_block.global_transform = cursor_mesh.global_transform
-					new_block.owner = world
 					
 				if automove:
 					var move = Vector3()
@@ -244,7 +242,7 @@ func _on_paste_requested():
 		for node in cursor_mesh.get_children():
 			node.queue_free()
 		# replace with clipboard
-		place_aabb = clipboard.get_child(0).aabb * clipboard.get_child(0).transform
+		place_aabb = clipboard.get_child(0).transform * clipboard.get_child(0).aabb
 		for block in clipboard.get_children():
 			for collision in block.get_all_collisions():
 				var dupe = collision.duplicate()
@@ -259,9 +257,12 @@ func _on_paste_requested():
 				instance.set_surface_override_material(0, mat)
 				cursor_mesh.add_child(instance)
 				instance.position = mesh[1]
-				instance.transform *= block.transform
-			place_aabb = place_aabb.merge(block.aabb * block.transform)
-#			print(place_aabb)
+				instance.transform = block.transform * instance.transform
+			place_aabb = place_aabb.expand(block.transform * block.aabb.position)
+			place_aabb = place_aabb.expand(block.transform * block.aabb.end)
+		print(place_aabb)
+		place_aabb = AABB(place_aabb.position, (place_aabb.size * 10).ceil()/10)
+		print(place_aabb)
 		pasting = true
 		editor_ui.force_UI("select", false)
 
@@ -286,16 +287,6 @@ func _on_save_or_load_requested(path, mode):
 				save_data.append(block_data)
 			var save_string = JSON.stringify(save_data," ")
 			save_file.store_line(save_string)
-	#		var construct = PackedScene.new()
-	#		var error = construct.pack(world)
-	#		if error == OK:
-	#			error = ResourceSaver.save(construct, path)
-	#			if error == OK:
-	#				print("Save done")
-	#			else:
-	#				print("Save failed, code " + str(error))
-	#		else:
-	#			print("Pack failed, code " + str(error))
 		FileDialog.FILE_MODE_OPEN_FILE:
 			# Load the file
 			print("Loading from " + path)
@@ -311,13 +302,6 @@ func _on_save_or_load_requested(path, mode):
 				world.add_child(block)
 				block.transform = parse_transform(block_data["transform"])
 				block.deserialize_modules(block_data["modules"])
-			
-#			var new_construct = load(path)
-#			world.name = "Old_Construct"
-#			world.queue_free()
-#			world = new_construct.instantiate()
-#			get_parent().add_child(world)
-#			world.name = "Construct_Root"
 
 func serialize_transform(xform):
 	return {
