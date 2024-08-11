@@ -86,12 +86,12 @@ func _unhandled_input(event):
 					new_block.global_transform = cursor_mesh.global_transform
 					new_block.owner = world
 					
-					if automove:
-						var move = Vector3()
-						move[abs(camera_focus.global_transform.basis.z).max_axis_index()] = -sign(camera_focus.global_transform.basis.z[abs(camera_focus.global_transform.basis.z).max_axis_index()])
-			#			move *= camera_focus.global_transform * (place_aabb.size)
-						move *= (place_area.transform * place_aabb).size.snapped(Vector3(0.1,0.1,0.1))
-						transform.origin += move
+				if automove:
+					var move = Vector3()
+					move[abs(camera_focus.global_transform.basis.z).max_axis_index()] = -sign(camera_focus.global_transform.basis.z[abs(camera_focus.global_transform.basis.z).max_axis_index()])
+		#			move *= camera_focus.global_transform * (place_aabb.size)
+					move *= (place_area.transform * place_aabb).size.snapped(Vector3(0.1,0.1,0.1))
+					transform.origin += move
 	
 	elif(event.is_action_pressed("EditorDelete")):
 		if(delete_area.has_overlapping_areas()):
@@ -193,7 +193,9 @@ func _on_selected_block_changed(block_name, unset_ui):
 	for node in place_area.get_children():
 		node.queue_free()
 	for collision in hand.get_all_collisions():
-		place_area.add_child(collision.duplicate())
+		var dupe = collision.duplicate()
+		place_area.add_child(dupe)
+		dupe.scale *= 0.98
 	for node in cursor_mesh.get_children():
 		node.queue_free()
 	for mesh in hand.get_all_meshes():
@@ -227,7 +229,7 @@ func _on_copy_requested():
 	for block in selected_blocks:
 		var block_copy = block.duplicate(7)
 		clipboard.add_child(block_copy)
-		block_copy.position = block.global_position - (selection_cube.global_position * 10).floor() / 10
+		block_copy.position = block.global_position - selection_cube.global_position.snapped(Vector3.ONE * 0.1)
 
 func _on_cut_requested():
 	_on_copy_requested()
@@ -248,6 +250,7 @@ func _on_paste_requested():
 				var dupe = collision.duplicate()
 				place_area.add_child(dupe)
 				dupe.transform *= block.transform
+				dupe.scale *= 0.98
 			for mesh in block.get_all_meshes():
 				var instance = MeshInstance3D.new()
 				instance.set_mesh(mesh[0])
@@ -258,7 +261,7 @@ func _on_paste_requested():
 				instance.position = mesh[1]
 				instance.transform *= block.transform
 			place_aabb = place_aabb.merge(block.aabb * block.transform)
-			print(place_aabb)
+#			print(place_aabb)
 		pasting = true
 		editor_ui.force_UI("select", false)
 
