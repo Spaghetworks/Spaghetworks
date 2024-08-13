@@ -6,7 +6,8 @@ extends VBoxContainer
 	"EditorPlace":"Place block",
 	"EditorDelete":"Delete block",
 	"EditorRotateMode":"Hold to rotate",
-	"EditorInteract":"Configure block"
+	"EditorInteract":"Configure block",
+	"EditorPalette":"Show/hide block selection"
 	}
 
 func _ready():

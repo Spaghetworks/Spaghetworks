@@ -11,11 +11,16 @@ var statemachine
 @onready var interaction = $VBoxContainer2/InteractionMenu
 @onready var interaction_list = $VBoxContainer2/InteractionMenu/VBoxContainer/VBoxContainer
 @onready var file_dialog = $FileDialog
+@onready var palette = $Palette
 const construct_dir = "user://Constructs"
 var file_dialog_init = false
 
 func _ready():
 	statemachine = get_node("/root/SceneStateMachine")
+
+func _unhandled_input(event):
+	if Input.is_action_just_pressed("EditorPalette"):
+		palette.visible = !palette.visible
 
 func _on_reload_pressed(): # Reload the editor by invoking a scene state transition
 	statemachine.switch_scene(statemachine.scenes.SCENE_EDITOR)
@@ -90,3 +95,7 @@ func _on_load_pressed():
 
 func _on_file_dialog_file_selected(path):
 	save_or_load_requested.emit(path, file_dialog.file_mode)
+
+
+func _on_toolbar_selected_string(block_name):
+	get_node("/root/CursorGlobals").change_selected_block(block_name, true)
