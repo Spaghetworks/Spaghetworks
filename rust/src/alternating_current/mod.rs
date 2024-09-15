@@ -1,7 +1,4 @@
-mod ac_graph_data;
-use ac_graph_data::{Constraint, VertexType};
-
-mod ac_graph;
-pub use ac_graph::*;
-
 pub type RealType = f64;
+mod ac_system;
+mod godot_interface;
+mod helper;

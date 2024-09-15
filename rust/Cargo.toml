@@ -8,5 +8,5 @@ crate-type = ["cdylib"]
 
 [dependencies]
 godot = { git = "https://github.com/godot-rust/gdext", branch = "master" }
-nalgebra = "0.32.3"
+nalgebra = "0.33.0"
 num-traits = "0.2.19"
