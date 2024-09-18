@@ -42,24 +42,25 @@ impl<T: GodotClass> Hash for TypedInstanceId<T> {
         self.instance_id.hash(state)
     }
 }
-impl<T: GodotClass> From<Gd<T>> for TypedInstanceId<T> {
-    fn from(value: Gd<T>) -> Self {
+impl<T: GodotClass> From<&Gd<T>> for TypedInstanceId<T> {
+    fn from(value: &Gd<T>) -> Self {
         TypedInstanceId {
             instance_id: value.instance_id(),
             _phantom: PhantomData,
         }
     }
 }
+
 impl<T: GodotClass> TryFrom<InstanceId> for TypedInstanceId<T> {
     type Error = ConvertError;
     /// Checks the engine for validity. The object may still drop afterwards, invalidating the TypedInstanceId.
     fn try_from(value: InstanceId) -> Result<Self, Self::Error> {
-        Ok(Gd::<T>::try_from_instance_id(value)?.into())
+        Ok((&Gd::<T>::try_from_instance_id(value)?).into())
     }
 }
-impl<T: GodotClass> TryFrom<TypedInstanceId<T>> for Gd<T> {
+impl<T: GodotClass> TryFrom<&TypedInstanceId<T>> for Gd<T> {
     type Error = godot::builtin::meta::ConvertError;
-    fn try_from(value: TypedInstanceId<T>) -> Result<Self, Self::Error> {
+    fn try_from(value: &TypedInstanceId<T>) -> Result<Self, Self::Error> {
         Gd::try_from_instance_id(value.instance_id)
     }
 }
