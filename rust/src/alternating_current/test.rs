@@ -3,63 +3,65 @@ mod test {
     /// A single 9v battery with a 2 ohm resistor across it. The -ve terminal is on node_a, the +ve terminal is on node_b,
     /// positive current is measured with current flowing from node_b to node_a.
     fn single_resistor() {
-        use crate::alternating_current::ac_system::{AcSystem, ConstraintBuilder};
+        use crate::alternating_current::ac_system::{AcCalculator, ConstraintBuilder};
         use nalgebra::Complex;
         use num_traits::{One, Zero};
 
-        let mut system: AcSystem<&str> = AcSystem::new();
+        let mut calculator: AcCalculator<&str> = AcCalculator::new();
         let resistor_impedence = Complex::new(2.0, 0.0);
         let voltage_source_voltage = Complex::new(9.0, 0.0);
         let epsilon = 1e-10;
 
-        let node_a = system.register_vertex("Node A");
-        let node_b = system.register_vertex("Node B");
-        let resistor_current = system.register_vertex("Resistor current");
-        let voltage_source_current = system.register_vertex("Voltage source current");
+        let node_a = calculator.register_vertex("Node A");
+        let node_b = calculator.register_vertex("Node B");
+        let resistor_current = calculator.register_vertex("Resistor current");
+        let voltage_source_current = calculator.register_vertex("Voltage source current");
 
         let _ground_constraint = ConstraintBuilder::new()
             .set_vertex_constraint(node_a, Complex::one())
             .set_constant_constraint(Complex::zero())
-            .finalize(&mut system);
+            .finalize(&mut calculator);
 
         let _current_invariant_constraint = ConstraintBuilder::new()
             .set_vertex_constraint(resistor_current, Complex::one())
             .set_vertex_constraint(voltage_source_current, -Complex::one())
-            .finalize(&mut system);
+            .finalize(&mut calculator);
 
         let _voltage_source_constraint = ConstraintBuilder::new()
             .set_vertex_constraint(node_a, -Complex::one())
             .set_vertex_constraint(node_b, Complex::one())
             .set_constant_constraint(-voltage_source_voltage)
-            .finalize(&mut system);
+            .finalize(&mut calculator);
 
         let _impedence_constraint = ConstraintBuilder::new()
             .set_vertex_constraint(resistor_current, resistor_impedence)
             .set_vertex_constraint(node_a, Complex::one())
             .set_vertex_constraint(node_b, -Complex::one())
-            .finalize(&mut system);
+            .finalize(&mut calculator);
 
-        let measured_a_voltage = system.get_vertex_result(node_a);
-        let measured_b_voltage = system.get_vertex_result(node_b);
-        let measured_resistor_current = system.get_vertex_result(resistor_current);
-        let measured_voltage_source_current = system.get_vertex_result(voltage_source_current);
+        let measured_a_voltage = calculator.get_vertex_result(node_a);
+        let measured_b_voltage = calculator.get_vertex_result(node_b);
+        let measured_resistor_current = calculator.get_vertex_result(resistor_current);
+        let measured_voltage_source_current = calculator.get_vertex_result(voltage_source_current);
 
-        system.print_matrix();
+        calculator.print_matrix();
         println!(
             "Node A index: {:?}",
-            system.vertices.get_vertex_result_index(node_a),
+            calculator.vertices.get_vertex_result_index(node_a),
         );
         println!(
             "Node B index: {:?}",
-            system.vertices.get_vertex_result_index(node_b),
+            calculator.vertices.get_vertex_result_index(node_b),
         );
         println!(
             "Resistor current index: {:?}",
-            system.vertices.get_vertex_result_index(resistor_current),
+            calculator
+                .vertices
+                .get_vertex_result_index(resistor_current),
         );
         println!(
             "Battery current index: {:?}",
-            system
+            calculator
                 .vertices
                 .get_vertex_result_index(voltage_source_current),
         );

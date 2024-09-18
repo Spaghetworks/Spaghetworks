@@ -44,13 +44,13 @@ impl<T> OldOrUpToDate<T> {
 }
 
 #[derive(Debug)]
-pub(crate) struct AcSystem<T: Clone> {
+pub(crate) struct AcCalculator<T: Clone> {
     pub(super) vertices: VertexCollection<T>,
     constraints: ConstraintCollection,
     matrix: RefCell<OldOrUpToDate<DMatrix<Complex<RealType>>>>,
     vertex_results: RefCell<Option<Vec<Complex<RealType>>>>,
 }
-impl<T: Clone> AcSystem<T> {
+impl<T: Clone> AcCalculator<T> {
     pub(crate) fn new() -> Self {
         Self {
             vertices: VertexCollection::new(),
@@ -240,8 +240,8 @@ impl ConstraintBuilder {
         self
     }
 
-    pub fn finalize<T: Clone>(self, system: &mut AcSystem<T>) -> ConstraintIdentifier {
-        system.register_constraint(Constraint {
+    pub fn finalize<T: Clone>(self, calculator: &mut AcCalculator<T>) -> ConstraintIdentifier {
+        calculator.register_constraint(Constraint {
             elements: self.constraint_list.into_boxed_slice(),
         })
     }
