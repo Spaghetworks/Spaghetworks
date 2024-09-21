@@ -71,5 +71,4 @@ shape = SubResource("BoxShape3D_neki8")
 [connection signal="copy_requested" from="EditorUI" to="Cursor" method="_on_copy_requested"]
 [connection signal="cut_requested" from="EditorUI" to="Cursor" method="_on_cut_requested"]
 [connection signal="paste_requested" from="EditorUI" to="Cursor" method="_on_paste_requested"]
-[connection signal="save_or_load_requested" from="EditorUI" to="Cursor" method="_on_save_or_load_requested"]
 [connection signal="select_toggled" from="EditorUI" to="Cursor" method="_on_select_toggled"]

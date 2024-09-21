@@ -5,7 +5,6 @@ signal select_toggled
 signal copy_requested
 signal cut_requested
 signal paste_requested
-signal save_or_load_requested
 
 var statemachine
 @onready var interaction = $VBoxContainer2/InteractionMenu
@@ -94,7 +93,25 @@ func _on_load_pressed():
 	file_dialog.visible = true
 
 func _on_file_dialog_file_selected(path):
-	save_or_load_requested.emit(path, file_dialog.file_mode)
+	var construct_root = get_node("../Construct_Root")
+	match file_dialog.file_mode:
+		FileDialog.FILE_MODE_OPEN_FILE:
+			# Load the file
+			print("Loading from " + path)
+			var save_file = FileAccess.open(path, FileAccess.READ)
+			var save_data = JSON.parse_string(save_file.get_as_text())
+			var proto_construct = get_node("/root/ConstructTranslator").from_file(save_data)
+			add_child(proto_construct)
+			for child in proto_construct.get_children():
+				child.reparent(construct_root, false)
+			proto_construct.queue_free()
+		FileDialog.FILE_MODE_SAVE_FILE:
+			if !path.ends_with(".json"):
+				path += ".json"
+			# Save the file
+			print("Saving to " + path)
+			var save_file = FileAccess.open(path, FileAccess.WRITE)
+			save_file.store_line(get_node("/root/ConstructTranslator").to_file(construct_root))
 
 
 func _on_toolbar_selected_string(block_name):

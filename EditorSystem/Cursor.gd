@@ -266,59 +266,7 @@ func _on_paste_requested():
 		pasting = true
 		editor_ui.force_UI("select", false)
 
-func _on_save_or_load_requested(path, mode):
-	# Actually save or load the construct
-	match mode:
-		FileDialog.FILE_MODE_SAVE_FILE:
-			if !path.ends_with(".json"):
-				path += ".json"
-			# Save the file
-			print("Saving to " + path)
-			var save_file = FileAccess.open(path, FileAccess.WRITE)
-			var save_data = []
-			for child in world.get_children():
-				if !child is MeshInstance3D:
-					# Skip things that aren't blocks (construct modules)
-					continue
-				var block_data = {}
-				block_data["transform"] = serialize_transform(child.transform)
-				block_data["block_name"] = child.get_meta("name")
-				block_data["modules"] = child.serialize_modules()
-				save_data.append(block_data)
-			var save_string = JSON.stringify(save_data," ")
-			save_file.store_line(save_string)
-		FileDialog.FILE_MODE_OPEN_FILE:
-			# Load the file
-			print("Loading from " + path)
-			var save_file = FileAccess.open(path, FileAccess.READ)
-			for child in world.get_children():
-				# Delete all the existing blocks
-				if child is MeshInstance3D:
-					child.queue_free()
-			var save_data = JSON.parse_string(save_file.get_as_text())
-			for block_data in save_data:
-				# Place each block
-				var block = get_node("/root/BlockLoader").blocks[block_data["block_name"]].duplicate(7)
-				world.add_child(block)
-				block.transform = parse_transform(block_data["transform"])
-				block.deserialize_modules(block_data["modules"])
 
-func serialize_transform(xform):
-	return {
-		"x" : vector_to_array(xform.basis.x),
-		"y" : vector_to_array(xform.basis.y),
-		"z" : vector_to_array(xform.basis.z),
-		"origin" : vector_to_array(xform.origin)
-	}
-
-func vector_to_array(vec):
-	return [vec.x, vec.y, vec.z]
-
-func array_to_vector(arr):
-	return Vector3(arr[0], arr[1], arr[2])
-
-func parse_transform(data):
-	return Transform3D(array_to_vector(data["x"]), array_to_vector(data["y"]), array_to_vector(data["z"]), array_to_vector(data["origin"]))
 
 
 

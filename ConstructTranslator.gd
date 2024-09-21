@@ -1,11 +1,17 @@
 extends Node
 
+static var root
+
+func _ready():
+	root = get_node("/root")
+
 static func to_world(proto_construct):
 	var com = Vector3.ZERO
 	var mass = 0
 	var moment = Vector3.ZERO
 	# Convert the root Node3D to a RigidBody3D
 	var construct = RigidBody3D.new()
+	construct.name = "Construct_Root"
 	proto_construct.replace_by(construct, true)
 	# Iterate over all blocks:
 	var block_mass
@@ -49,3 +55,45 @@ static func to_world(proto_construct):
 static func to_editor(_construct):
 	
 	pass
+
+static func to_file(proto_construct):
+	var save_data = []
+	for child in proto_construct.get_children():
+		if !child is MeshInstance3D:
+			# Skip things that aren't blocks (construct modules)
+			continue
+		var block_data = {}
+		block_data["transform"] = serialize_transform(child.transform)
+		block_data["block_name"] = child.get_meta("name")
+		block_data["modules"] = child.serialize_modules()
+		save_data.append(block_data)
+	return JSON.stringify(save_data," ")
+
+static func from_file(save_data):
+	var construct_root = Node3D.new()
+	construct_root.name = "Construct_Root"
+	for block_data in save_data:
+		# Place each block
+		var block = root.get_node("/root/BlockLoader").blocks[block_data["block_name"]].duplicate(7)
+		construct_root.add_child(block)
+		block.transform = parse_transform(block_data["transform"])
+		block.deserialize_modules(block_data["modules"])
+	return construct_root
+	
+
+static func serialize_transform(xform):
+	return {
+		"x" : vector_to_array(xform.basis.x),
+		"y" : vector_to_array(xform.basis.y),
+		"z" : vector_to_array(xform.basis.z),
+		"origin" : vector_to_array(xform.origin)
+	}
+
+static func vector_to_array(vec):
+	return [vec.x, vec.y, vec.z]
+
+static func array_to_vector(arr):
+	return Vector3(arr[0], arr[1], arr[2])
+
+static func parse_transform(data):
+	return Transform3D(array_to_vector(data["x"]), array_to_vector(data["y"]), array_to_vector(data["z"]), array_to_vector(data["origin"]))
