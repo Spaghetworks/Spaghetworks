@@ -52,9 +52,21 @@ static func to_world(proto_construct):
 	
 	return construct
 
-static func to_editor(_construct):
-	
-	pass
+static func to_editor(live_construct):
+	var construct_root = Node3D.new()
+	for child in live_construct.get_children():
+		if child is MeshInstance3D: # it's a block
+			var block = root.get_node("/root/BlockLoader").blocks[child.get_meta("name")].duplicate(7)
+			construct_root.add_child(block)
+			block.transform = child.transform
+			block.deserialize_modules(child.serialize_modules())
+		elif child is CollisionShape3D: # it's a collision shape
+			continue
+		elif child is Node3D: # it's a construct module
+			var module = child.new()
+			construct_root.add_child(module)
+			module.name = child.name
+	return construct_root
 
 static func to_file(proto_construct):
 	var save_data = []

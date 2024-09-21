@@ -67,18 +67,22 @@ layout_mode = 2
 
 [node name="Restart Editor" type="Button" parent="Panel3/Control/Top-Left Buttons"]
 layout_mode = 2
+focus_mode = 0
 text = "Restart Editor"
 
 [node name="Go To Sim" type="Button" parent="Panel3/Control/Top-Left Buttons"]
 layout_mode = 2
+focus_mode = 0
 text = "Go To Sim"
 
 [node name="Save" type="Button" parent="Panel3/Control/Top-Left Buttons"]
 layout_mode = 2
+focus_mode = 0
 text = "Save"
 
 [node name="Load" type="Button" parent="Panel3/Control/Top-Left Buttons"]
 layout_mode = 2
+focus_mode = 0
 text = "Load"
 
 [node name="Controls Hints" type="VBoxContainer" parent="Panel3/Control"]
@@ -109,25 +113,30 @@ grow_horizontal = 2
 
 [node name="Automove" parent="VBoxContainer2/Panel/HFlowContainer" instance=ExtResource("5_yhok4")]
 layout_mode = 2
+focus_mode = 0
 button_pressed = true
 text = "Automove"
 
 [node name="Select" parent="VBoxContainer2/Panel/HFlowContainer" instance=ExtResource("5_yhok4")]
 layout_mode = 2
+focus_mode = 0
 text = "Select"
 
 [node name="Copy" type="Button" parent="VBoxContainer2/Panel/HFlowContainer"]
 layout_mode = 2
+focus_mode = 0
 disabled = true
 text = "Copy"
 
 [node name="Cut" type="Button" parent="VBoxContainer2/Panel/HFlowContainer"]
 layout_mode = 2
+focus_mode = 0
 disabled = true
 text = "Cut"
 
 [node name="Paste" type="Button" parent="VBoxContainer2/Panel/HFlowContainer"]
 layout_mode = 2
+focus_mode = 0
 text = "Paste"
 
 [node name="InteractionMenu" type="Panel" parent="VBoxContainer2"]

@@ -1,8 +1,9 @@
-[gd_scene load_steps=7 format=3 uid="uid://cd2m7m3p31lsu"]
+[gd_scene load_steps=8 format=3 uid="uid://cd2m7m3p31lsu"]
 
 [ext_resource type="Script" path="res://SimulationSystem/Simulation.gd" id="1_fxqht"]
 [ext_resource type="PackedScene" uid="uid://bok2xg5rroygo" path="res://TestMap.tscn" id="2_7m18w"]
 [ext_resource type="PackedScene" uid="uid://dc22xe8nqjrxt" path="res://CharacterSystem/Character.tscn" id="3_jb07j"]
+[ext_resource type="PackedScene" uid="uid://c4m6sj5gxmlpe" path="res://SimulationSystem/Simulation_UI.tscn" id="4_yldyq"]
 
 [sub_resource type="PhysicalSkyMaterial" id="PhysicalSkyMaterial_qexaa"]
 rayleigh_coefficient = 3.0
@@ -32,3 +33,5 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16.2192, 3.62452, 0.424957)
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_1bxdo")
+
+[node name="SimulationUI" parent="." instance=ExtResource("4_yldyq")]
