@@ -1,6 +1,7 @@
 extends Node
 
 static var root
+static var construct_template = preload("res://construct_template.tscn")
 
 func _ready():
 	root = get_node("/root")
@@ -53,7 +54,7 @@ static func to_world(proto_construct):
 	return construct
 
 static func to_editor(live_construct):
-	var construct_root = Node3D.new()
+	var construct_root = construct_template.instantiate()
 	for child in live_construct.get_children():
 		if child is MeshInstance3D: # it's a block
 			var block = root.get_node("/root/BlockLoader").blocks[child.get_meta("name")].duplicate(7)
@@ -82,7 +83,7 @@ static func to_file(proto_construct):
 	return JSON.stringify(save_data," ")
 
 static func from_file(save_data):
-	var construct_root = Node3D.new()
+	var construct_root = construct_template.instantiate()
 	construct_root.name = "Construct_Root"
 	for block_data in save_data:
 		# Place each block

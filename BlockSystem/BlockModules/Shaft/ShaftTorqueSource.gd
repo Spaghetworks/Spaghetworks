@@ -19,10 +19,10 @@ func _enter_tree():
 		assemble_ui()
 		get_parent().ui_requested.connect(_on_ui_requested)
 
-func get_torque(body):
+func get_torque(_body):
 	return torque * element.get_alignment()
 
-func get_sub_torque(body):
+func get_sub_torque(_body):
 	return torque * element.get_alignment()
 
 func _on_torque_changed(text):

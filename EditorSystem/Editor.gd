@@ -1,12 +1,16 @@
 extends Node3D
 
+signal construct_root_replaced
+
+@onready var construct_root = $Construct_Root
 
 func recieve(payload): # Recieves extra information immediately after scene change
 	if payload.has("editable_construct"):
-		var construct_root = $Construct_Root
-		var proto_construct = payload["editable_construct"]
-		add_child(proto_construct)
-		for child in payload["editable_construct"].get_children():
-			child.reparent(construct_root, false)
-		proto_construct.queue_free()
-		pass
+		var root_xform = construct_root.transform
+		construct_root.name = "Construct_Root_Old"
+		construct_root.queue_free()
+		construct_root = payload["editable_construct"]
+		construct_root.name = "Construct_Root"
+		add_child(construct_root)
+		construct_root.transform = root_xform
+		construct_root_replaced.emit(construct_root)

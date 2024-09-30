@@ -8,7 +8,7 @@ var color_false = Color("D22300")
 func _ready():
 	dirty = true
 
-func _process(delta):
+func _process(_delta):
 	if dirty:
 		if get_parent().button_pressed:
 			color = color_true

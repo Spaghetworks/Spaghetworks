@@ -17,7 +17,7 @@ var file_dialog_init = false
 func _ready():
 	statemachine = get_node("/root/SceneStateMachine")
 
-func _unhandled_input(event):
+func _unhandled_input(_event):
 	if Input.is_action_just_pressed("EditorPalette"):
 		palette.visible = !palette.visible
 
@@ -101,10 +101,7 @@ func _on_file_dialog_file_selected(path):
 			var save_file = FileAccess.open(path, FileAccess.READ)
 			var save_data = JSON.parse_string(save_file.get_as_text())
 			var proto_construct = get_node("/root/ConstructTranslator").from_file(save_data)
-			add_child(proto_construct)
-			for child in proto_construct.get_children():
-				child.reparent(construct_root, false)
-			proto_construct.queue_free()
+			get_parent().recieve({"editable_construct":proto_construct})
 		FileDialog.FILE_MODE_SAVE_FILE:
 			if !path.ends_with(".json"):
 				path += ".json"

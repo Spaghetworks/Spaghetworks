@@ -23,14 +23,14 @@ func _on_button_pressed():
 
 # Droppable data must be a dictionary with a valid "type" key
 
-func _can_drop_data(at_position, data):
+func _can_drop_data(_at_position, data):
 	print("drop queried")
 	if data is Dictionary && data.has("type"):
 		if data["type"] == "block":
 			return true
 	return false
 
-func _drop_data(at_position, data):
+func _drop_data(_at_position, data):
 	match data["type"]:
 		"block":
 			updated.emit(number, data["display_name"], data["name"])

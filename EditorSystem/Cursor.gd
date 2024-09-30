@@ -266,6 +266,10 @@ func _on_paste_requested():
 		pasting = true
 		editor_ui.force_UI("select", false)
 
+func _on_construct_root_replaced(construct_root):
+	world = construct_root
+
+
 
 
 
