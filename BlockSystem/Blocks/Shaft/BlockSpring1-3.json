@@ -6,8 +6,9 @@
 	"visual_mesh":"Blocks/Shaft/block_spring_1_3.obj",
 	"collision_mesh":
 	{
-		"name":"generator_cuboid",
-		"dimensions":[3,3,3]
+		"name":"generator_cylinder",
+		"diameter": 3,
+		"height": 3
 	},
 	"modules":
 	[

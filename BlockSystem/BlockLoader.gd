@@ -130,6 +130,17 @@ func assign_collision(block, collider):
 				dimensions /= 10
 				shape.set_size(dimensions)
 				new_aabb = AABB(-dimensions / 2 + collision.position, dimensions)
+			"generator_cylinder":
+				shape = CylinderShape3D.new()
+				var radius
+				if collider.has("diameter"):
+					radius = collider["diameter"] / 20
+				else:
+					radius = collider["radius"] / 10
+				var height = collider["height"] / 10
+				shape.radius = radius
+				shape.height = height
+				new_aabb = AABB(Vector3(-radius, -height / 2, -radius) + collision.position, Vector3(radius * 2, height, radius * 2))
 	collision.set_shape(shape)
 	block.get_child(0).add_child(collision)
 	block.add_collision(collision)
