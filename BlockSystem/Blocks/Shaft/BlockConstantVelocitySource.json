@@ -11,7 +11,7 @@
 	{
 		"name":"generator_cylinder",
 		"diameter": 2,
-		"height": 3
+		"height": 3,
 	},
 	"modules":
 	[

@@ -116,6 +116,9 @@ func assign_collision(block, collider):
 	var collision = CollisionShape3D.new()
 	if collider.has("offset"):
 		collision.position = Vector3(collider["offset"][0],collider["offset"][1],collider["offset"][2])
+	if collider.has("axis"):
+		var axis = Vector3(collider["axis"][0],collider["axis"][1],collider["axis"][2])
+		collision.rotate(axis, deg_to_rad(collider["angle"]))
 	if typeof(collider) == TYPE_STRING:
 	# Asset path
 		print("COLLISION ASSETS NOT YET HANDLED")
