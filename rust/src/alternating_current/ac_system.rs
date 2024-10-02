@@ -69,7 +69,7 @@ impl<T: Clone> AcCalculator<T> {
         associated_id
     }
 
-    pub(crate) fn register_constraint(&mut self, constraint: Constraint) -> ConstraintIdentifier {
+    fn register_constraint(&mut self, constraint: Constraint) -> ConstraintIdentifier {
         // Invalidate cache
         self.invalidate_constraint_cache();
 
@@ -80,6 +80,10 @@ impl<T: Clone> AcCalculator<T> {
         }
         let constraint_identifier = self.constraints.add(constraint);
         constraint_identifier
+    }
+
+    pub(crate) fn get_constraint_builder(&mut self) -> ConstraintBuilder<T> {
+        ConstraintBuilder::new(self)
     }
 
     fn invalidate_constraint_cache(&mut self) {
@@ -194,13 +198,15 @@ impl<T: Clone> AcCalculator<T> {
     }
 }
 
-pub struct ConstraintBuilder {
+pub struct ConstraintBuilder<'a, T: Clone> {
     constraint_list: Vec<ConstraintElement>,
+    ac_calculator: &'a mut AcCalculator<T>,
 }
-impl ConstraintBuilder {
-    pub fn new() -> Self {
+impl<'a, T: Clone> ConstraintBuilder<'a, T> {
+    fn new(ac_calculator: &'a mut AcCalculator<T>) -> Self {
         Self {
             constraint_list: vec![],
+            ac_calculator,
         }
     }
 
@@ -240,8 +246,8 @@ impl ConstraintBuilder {
         self
     }
 
-    pub fn finalize<T: Clone>(self, calculator: &mut AcCalculator<T>) -> ConstraintIdentifier {
-        calculator.register_constraint(Constraint {
+    pub fn finalize(self) -> ConstraintIdentifier {
+        self.ac_calculator.register_constraint(Constraint {
             elements: self.constraint_list.into_boxed_slice(),
         })
     }
