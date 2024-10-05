@@ -115,7 +115,7 @@
 			{
 				"damper_name":"damper",
 				"element_names":["internal","output"],
-				"damping":1,
+				"damping":10,
 			}
 		},
 
