@@ -100,8 +100,8 @@ func step(delta):
 	delta /= substeps
 	var children = get_children()
 	
-	for substep in range(0,1):
-#	for substep in range(0,substeps):
+#	for substep in range(0,1):
+	for substep in range(0,substeps):
 		for body in children:
 			body.sub_pos = body.position + body.velocity * delta + body.acceleration * delta * delta / 2
 		for body in children:
