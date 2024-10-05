@@ -68,6 +68,28 @@ impl<T: Clone> AcCalculator<T> {
         // *(self.vertex_results.get_mut()) = None;
         associated_id
     }
+    pub(crate) fn deregister_vertex(&mut self, identifier: AcVertexIdentifier) {
+        self.vertices.remove_vertex(identifier);
+    }
+    pub(crate) fn get_vertex_result(
+        &mut self,
+        vertex: AcVertexIdentifier,
+    ) -> Option<Complex<RealType>> {
+        if let Some(index) = self.vertices.get_vertex_result_index(vertex) {
+            self.refresh_results_cache();
+            // Now self.vertex_results could be Some if the matrix inversion worked, or None if it did not.
+
+            self.vertex_results
+                .borrow()
+                .as_ref()
+                .and_then(|results| Some(results[usize::from(index)]))
+        } else {
+            Some(Complex::zero())
+        }
+    }
+    pub(crate) fn get_constraint_builder(&mut self) -> ConstraintBuilder<T> {
+        ConstraintBuilder::new(self)
+    }
 
     fn register_constraint(&mut self, constraint: Constraint) -> ConstraintIdentifier {
         // Invalidate cache
@@ -80,10 +102,6 @@ impl<T: Clone> AcCalculator<T> {
         }
         let constraint_identifier = self.constraints.add(constraint);
         constraint_identifier
-    }
-
-    pub(crate) fn get_constraint_builder(&mut self) -> ConstraintBuilder<T> {
-        ConstraintBuilder::new(self)
     }
 
     fn invalidate_constraint_cache(&mut self) {
@@ -177,23 +195,6 @@ impl<T: Clone> AcCalculator<T> {
 
                 *(self.vertex_results.borrow_mut()) = Some(result_vec);
             }
-        }
-    }
-
-    pub(crate) fn get_vertex_result(
-        &mut self,
-        vertex: AcVertexIdentifier,
-    ) -> Option<Complex<RealType>> {
-        if let Some(index) = self.vertices.get_vertex_result_index(vertex) {
-            self.refresh_results_cache();
-            // Now self.vertex_results could be Some if the matrix inversion worked, or None if it did not.
-
-            self.vertex_results
-                .borrow()
-                .as_ref()
-                .and_then(|results| Some(results[usize::from(index)]))
-        } else {
-            Some(Complex::zero())
         }
     }
 }
@@ -338,7 +339,7 @@ impl<T: Clone> VertexCollection<T> {
             identifier
         }
     }
-    fn get_vertex(&self, id: AcVertexIdentifier) -> Option<T> {
+    fn get_vertex_payload(&self, id: AcVertexIdentifier) -> Option<T> {
         if self.registered_vertices.len() > id.index
             && self.registered_vertices[id.index].generation == id.generation
         {
