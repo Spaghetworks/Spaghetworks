@@ -1,32 +1,33 @@
-[gd_scene load_steps=8 format=3 uid="uid://1wniauwjbqlj"]
+[gd_scene load_steps=10 format=3 uid="uid://1wniauwjbqlj"]
 
 [ext_resource type="PackedScene" uid="uid://cce1d3rlkl60v" path="res://EditorSystem/EditorEnvironment.tscn" id="1_3kth4"]
 [ext_resource type="Script" path="res://EditorSystem/Editor.gd" id="1_ky32n"]
 [ext_resource type="Script" path="res://CameraOrbitController.gd" id="2_aiub8"]
 [ext_resource type="Script" path="res://EditorSystem/Cursor.gd" id="3_55b8q"]
-[ext_resource type="Script" path="res://ShaftSystem.gd" id="3_ipy7v"]
+[ext_resource type="PackedScene" uid="uid://c2rggi7umb63u" path="res://construct_template.tscn" id="3_n1kh5"]
 [ext_resource type="PackedScene" uid="uid://bl5igur7y2g8s" path="res://EditorSystem/Editor_UI.tscn" id="4_ylqfi"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_4u2mi"]
 size = Vector3(0.1, 0.1, 0.1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_d87xr"]
+transparency = 1
+albedo_color = Color(0.25098, 1, 0.258824, 0.780392)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_neki8"]
 
 [node name="World" type="Node3D"]
 script = ExtResource("1_ky32n")
 
 [node name="EditorEnvironment" parent="." instance=ExtResource("1_3kth4")]
 
-[node name="Construct_Root" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3, 0)
-
-[node name="ShaftSystem" type="Node" parent="Construct_Root"]
-script = ExtResource("3_ipy7v")
+[node name="Construct_Root" parent="." instance=ExtResource("3_n1kh5")]
 
 [node name="Cursor" type="Node3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3, 0)
 script = ExtResource("3_55b8q")
 
 [node name="Place_Area" type="Area3D" parent="Cursor"]
-transform = Transform3D(0.98, 0, 0, 0, 0.98, 0, 0, 0, 0.98, 0, 0, 0)
 collision_layer = 0
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Cursor/Place_Area"]
@@ -50,5 +51,21 @@ current = true
 
 [node name="EditorUI" parent="." instance=ExtResource("4_ylqfi")]
 
+[node name="Selection_Cube" type="CSGBox3D" parent="."]
+visible = false
+material = SubResource("StandardMaterial3D_d87xr")
+
+[node name="Area3D" type="Area3D" parent="Selection_Cube"]
+collision_layer = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Selection_Cube/Area3D"]
+shape = SubResource("BoxShape3D_neki8")
+
+[connection signal="construct_root_replaced" from="." to="Cursor" method="_on_construct_root_replaced"]
 [connection signal="area_entered" from="Cursor/Place_Area" to="Cursor" method="_on_place_area_area_entered"]
 [connection signal="area_exited" from="Cursor/Place_Area" to="Cursor" method="_on_place_area_area_exited"]
+[connection signal="automove_toggled" from="EditorUI" to="Cursor" method="_on_automove_toggled"]
+[connection signal="copy_requested" from="EditorUI" to="Cursor" method="_on_copy_requested"]
+[connection signal="cut_requested" from="EditorUI" to="Cursor" method="_on_cut_requested"]
+[connection signal="paste_requested" from="EditorUI" to="Cursor" method="_on_paste_requested"]
+[connection signal="select_toggled" from="EditorUI" to="Cursor" method="_on_select_toggled"]

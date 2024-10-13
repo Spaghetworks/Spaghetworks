@@ -19,10 +19,10 @@ func _enter_tree():
 		assemble_ui()
 		get_parent().ui_requested.connect(_on_ui_requested)
 
-func get_torque(body):
+func get_torque(_body):
 	return torque * element.get_alignment()
 
-func get_sub_torque(body):
+func get_sub_torque(_body):
 	return torque * element.get_alignment()
 
 func _on_torque_changed(text):
@@ -47,3 +47,12 @@ func assemble_ui():
 	
 	ui.get_child(1).add_child(line[0])
 	ui.get_child(1).add_child(line[1])
+
+func serialize():
+	return {
+		"name" : name,
+		"torque" : torque
+	}
+
+func deserialize(data):
+	torque = data["torque"]

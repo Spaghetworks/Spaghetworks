@@ -32,7 +32,7 @@ func _enter_tree():
 	assemble_ui()
 	get_parent().ui_requested.connect(_on_ui_requested)
 
-func get_torque(body):
+func get_torque(body, _delta):
 	var displacement = \
 		element_a.get_position() - \
 		element_b.get_position()
@@ -43,7 +43,7 @@ func get_torque(body):
 	else:
 		return displacement * spring_constant * element_b.get_alignment()
 	
-func get_sub_torque(body):
+func get_sub_torque(body, _sub_delta):
 	var displacement = \
 		element_a.get_sub_pos() - \
 		element_b.get_sub_pos()
@@ -77,3 +77,14 @@ func _on_spring_preload_changed(text):
 
 func _on_ui_requested():
 	get_parent().provide_ui(ui)
+	
+func serialize():
+	return {
+		"name" : name,
+		"spring_constant" : spring_constant,
+		"spring_preload" : spring_preload
+	}
+
+func deserialize(data):
+	spring_constant = data["spring_constant"]
+	spring_preload = data["spring_preload"]

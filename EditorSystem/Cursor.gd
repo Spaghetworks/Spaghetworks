@@ -1,7 +1,7 @@
 extends Node3D
 
 var world
-var hand #= preload("res://Blocks/Generic/BlockCube.tscn")
+var hand # block(s) to be placed
 var place_area # collision shape should correspond to the collision shape of the object in hand
 var delete_area # collision shape should always remain a simple 1-cube
 				#TODO: _should_ it? why?
@@ -9,14 +9,32 @@ var cursor_mesh # mesh which previews the object in hand
 var camera_focus # focus xform for the camera
 var editor_ui # root UI object
 
-var collider_dirty = true # signals to check obstruction on next frame
+var collider_dirty = true # check obstruction on next frame
 var rotate_mode = false # should directional inputs be translation or rotation?
 var interacting # block which interaction menu is active
+var automove = true # advance the cursor by the size of the thing being placed
+var place_aabb # dimensions of the object in hand
+var selecting = false # select mode
+var selection_aabb # selected AABB
+var selection_cube # renders selection volume
+var selection_dirty = 0 # check selection area next frame
+var selected_blocks = Array() # list of blocks in the selection area
+var clipboard = Node3D.new() # copied/cut group of blocks, which can be sent to the hand
+var pasting = false # whether the thing to be placed is pasting from the clipboard, as opposed to the block in hand
 
 func _process(_delta):
 	if(collider_dirty):
 		# check obstruction to draw the cursor preview
 		obstructed()
+
+func _physics_process(_delta):
+	if selection_dirty == 1:
+		print(selection_cube.get_node("Area3D").get_overlapping_areas().size())
+		selected_blocks = Array()
+		for block_area in selection_cube.get_node("Area3D").get_overlapping_areas():
+			selected_blocks.append(block_area.get_parent())
+	if selection_dirty > 0:
+		selection_dirty -= 1
 
 func _enter_tree():
 	get_node("/root/CursorGlobals").selected_block_changed.connect(_on_selected_block_changed)
@@ -26,6 +44,7 @@ func _enter_tree():
 	delete_area = $Delete_Area
 	cursor_mesh = $Cursor_Mesh
 	camera_focus = $Camera_Focus
+	selection_cube = $"../Selection_Cube"
 
 func _unhandled_input(event):
 	if(Input.is_action_just_pressed("EditorRotateMode")):
@@ -36,26 +55,57 @@ func _unhandled_input(event):
 		print("Translation")
 	
 	if(event.is_action_pressed("EditorPlace")):
-		if hand == null:
-			print("no block selected")
-			return
-		if(place_area.has_overlapping_areas()):
-			# Fail to place the thing
-			print("placement obstructed")
+		if selecting: #do selection stuff
+			if selection_aabb == null:
+				selection_aabb = AABB(position, Vector3.ZERO)
+			else:
+				selection_aabb = selection_aabb.expand(position)
+			update_selection_cube()
 		else:
-			# Place the thing in hand
-			print("placing item")
-			var new_block = hand.duplicate(7)
-			world.add_child(new_block)
-			new_block.global_transform = cursor_mesh.global_transform
+			if !pasting && hand == null:
+				print("no block selected")
+				return
+			if(place_area.has_overlapping_areas()):
+				# Fail to place the thing
+				print("placement obstructed")
+			else:
+				if pasting:
+					# Place the thing in the clipboard
+					print("pasting from clipboard")
+					for block in clipboard.get_children():
+						var new_block = block.duplicate(7)
+						world.add_child(new_block)
+						new_block.global_transform = cursor_mesh.global_transform
+						new_block.transform *= block.transform
+				else:
+					# Place the thing in hand
+					print("placing item")
+					var new_block = hand.duplicate(7)
+					world.add_child(new_block)
+					new_block.global_transform = cursor_mesh.global_transform
+					
+				if automove:
+					var move = Vector3()
+					move[abs(camera_focus.global_transform.basis.z).max_axis_index()] = -sign(camera_focus.global_transform.basis.z[abs(camera_focus.global_transform.basis.z).max_axis_index()])
+		#			move *= camera_focus.global_transform * (place_aabb.size)
+					move *= (place_area.transform * place_aabb).size.snapped(Vector3(0.1,0.1,0.1))
+					transform.origin += move
 	
 	elif(event.is_action_pressed("EditorDelete")):
 		if(delete_area.has_overlapping_areas()):
 			# Delete the thing under the cursor
 			print("deleting item")
-			delete_area.get_overlapping_areas()[0].get_parent().queue_free()
+			var block = delete_area.get_overlapping_areas()[0].get_parent()
 			collider_dirty = true
 			hide_interaction()
+			
+			var move = Vector3()
+			move[abs(camera_focus.global_transform.basis.z).max_axis_index()] = -sign(camera_focus.global_transform.basis.z[abs(camera_focus.global_transform.basis.z).max_axis_index()])
+#			move *= camera_focus.global_transform * (place_aabb.size)
+			move *= (place_area.transform * block.aabb).size.snapped(Vector3(0.1,0.1,0.1))
+			print(move)
+			transform.origin -= move
+			block.queue_free()
 		else:
 			print("nothing to delete")
 	
@@ -85,8 +135,8 @@ func _unhandled_input(event):
 			)
 			# Xform the rotation per the camera's look direction
 			control_rotate = control_rotate.rotated(Vector3.UP, round(camera_focus.rotation.y / (PI/2)) * PI/2 * sign(camera_focus.basis.y.dot(Vector3.UP)))
-			cursor_mesh.transform = cursor_mesh.transform.rotated_local(control_rotate, PI/2)
-			place_area.transform = place_area.transform.rotated_local(control_rotate, PI/2)
+			cursor_mesh.transform = cursor_mesh.transform.rotated(control_rotate, PI/2)
+			place_area.transform = place_area.transform.rotated(control_rotate, PI/2)
 		else:
 			# Move the cursor
 			var cursor_move = Vector3(
@@ -100,6 +150,16 @@ func _unhandled_input(event):
 			
 			# Detach and close the interaction menu
 			hide_interaction()
+
+func update_selection_cube():
+	if !selecting || selection_aabb == null:
+		selection_cube.visible = false
+	else:
+		selection_cube.visible = true
+		selection_cube.size = selection_aabb.size + Vector3.ONE * 0.1
+		selection_cube.position = selection_aabb.get_center()
+		selection_cube.get_node("Area3D/CollisionShape3D").shape.size = selection_cube.size - Vector3.ONE * 0.01
+		selection_dirty = 2
 
 func hide_interaction():
 	if interacting:
@@ -125,18 +185,97 @@ func _on_place_area_area_entered(_area):
 func _on_place_area_area_exited(_area):
 	obstructed()
 
-func _on_selected_block_changed(block_name):
+func _on_selected_block_changed(block_name, unset_ui):
 	print("block changed to " + block_name)
 	hand = get_node("/root/BlockLoader").blocks[block_name]
-#	print(hand.get_node("Area3D/CollisionShape3D"))
-	place_area.get_child(0).set_shape(hand.get_node("Area3D/CollisionShape3D").get_shape())
+	for node in place_area.get_children():
+		node.queue_free()
+	for collision in hand.get_all_collisions():
+		var dupe = collision.duplicate()
+		place_area.add_child(dupe)
+		dupe.scale *= 0.98
 	for node in cursor_mesh.get_children():
 		node.queue_free()
 	for mesh in hand.get_all_meshes():
 		var instance = MeshInstance3D.new()
-		instance.set_mesh(mesh)
+		instance.set_mesh(mesh[0])
 		var mat = StandardMaterial3D.new()
 		mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 		instance.set_surface_override_material(0, mat)
 		cursor_mesh.add_child(instance)
-#	cursor_mesh.set_mesh(hand.get_all_meshes())
+		instance.position = mesh[1]
+	place_aabb = hand.aabb
+	pasting = false
+	if unset_ui:
+		editor_ui.force_UI("select", false)
+
+
+func _on_automove_toggled(state):
+	automove = state
+
+
+func _on_select_toggled(state):
+	selecting = state
+	selection_aabb = null
+	update_selection_cube()
+	if state:
+		_on_selected_block_changed("block_cube", false)
+
+func _on_copy_requested():
+	for child in clipboard.get_children():
+		child.queue_free()
+	for block in selected_blocks:
+		var block_copy = block.duplicate(7)
+		clipboard.add_child(block_copy)
+		block_copy.position = block.global_position - selection_cube.global_position.snapped(Vector3.ONE * 0.1)
+
+func _on_cut_requested():
+	_on_copy_requested()
+	for block in selected_blocks:
+		block.queue_free()
+
+func _on_paste_requested():
+	if clipboard.get_child_count() > 0:
+		# clear hand
+		for node in place_area.get_children():
+			node.queue_free()
+		for node in cursor_mesh.get_children():
+			node.queue_free()
+		# replace with clipboard
+		place_aabb = clipboard.get_child(0).transform * clipboard.get_child(0).aabb
+		for block in clipboard.get_children():
+			for collision in block.get_all_collisions():
+				var dupe = collision.duplicate()
+				place_area.add_child(dupe)
+				dupe.transform *= block.transform
+				dupe.scale *= 0.98
+			for mesh in block.get_all_meshes():
+				var instance = MeshInstance3D.new()
+				instance.set_mesh(mesh[0])
+				var mat = StandardMaterial3D.new()
+				mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+				instance.set_surface_override_material(0, mat)
+				cursor_mesh.add_child(instance)
+				instance.position = mesh[1]
+				instance.transform = block.transform * instance.transform
+			place_aabb = place_aabb.expand(block.transform * block.aabb.position)
+			place_aabb = place_aabb.expand(block.transform * block.aabb.end)
+		print(place_aabb)
+		place_aabb = AABB(place_aabb.position, (place_aabb.size * 10).ceil()/10)
+		print(place_aabb)
+		pasting = true
+		editor_ui.force_UI("select", false)
+
+func _on_construct_root_replaced(construct_root):
+	world = construct_root
+
+
+
+
+
+
+
+
+
+
+

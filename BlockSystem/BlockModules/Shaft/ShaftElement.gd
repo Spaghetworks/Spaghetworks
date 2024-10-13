@@ -55,7 +55,8 @@ func _physics_process(_delta):
 		rebuild_this_frame = false
 
 func _exit_tree():
-	body.elements -= 1
+	if is_instance_valid(body):
+		body.elements -= 1
 
 func attach(shaft_body):
 	if is_instance_valid(body):

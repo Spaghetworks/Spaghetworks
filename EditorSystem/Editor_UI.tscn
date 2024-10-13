@@ -1,8 +1,11 @@
-[gd_scene load_steps=4 format=3 uid="uid://bl5igur7y2g8s"]
+[gd_scene load_steps=7 format=3 uid="uid://bl5igur7y2g8s"]
 
 [ext_resource type="Script" path="res://EditorSystem/EditorUI.gd" id="1_avofj"]
+[ext_resource type="Script" path="res://EditorSystem/ControlHints.gd" id="2_mrnho"]
 [ext_resource type="Script" path="res://Palette.gd" id="2_r11f3"]
 [ext_resource type="Script" path="res://StatMonitor.gd" id="3_bua5r"]
+[ext_resource type="PackedScene" uid="uid://y1r6djf2dq37" path="res://ToggleButton.tscn" id="5_yhok4"]
+[ext_resource type="PackedScene" uid="uid://bvu3llgu61m1o" path="res://Toolbar.tscn" id="6_hl5rt"]
 
 [node name="EditorUI" type="Control"]
 layout_mode = 3
@@ -14,25 +17,21 @@ grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("1_avofj")
 
-[node name="Top-Left Buttons" type="HBoxContainer" parent="."]
-layout_mode = 0
-
-[node name="Restart Editor" type="Button" parent="Top-Left Buttons"]
-layout_mode = 2
-text = "Restart Editor"
-
-[node name="Go To Sim" type="Button" parent="Top-Left Buttons"]
-layout_mode = 2
-text = "Go To Sim"
-
-[node name="TabContainer" type="TabContainer" parent="."]
+[node name="Palette" type="TabContainer" parent="."]
+visible = false
+custom_minimum_size = Vector2(1053, 0)
 layout_mode = 1
-anchors_preset = 2
-anchor_top = 1.0
-anchor_bottom = 1.0
-offset_top = -72.0
-offset_right = 1042.0
-grow_vertical = 0
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -526.5
+offset_top = -247.0
+offset_right = 526.5
+offset_bottom = 247.0
+grow_horizontal = 2
+grow_vertical = 2
 script = ExtResource("2_r11f3")
 
 [node name="Panel" type="Panel" parent="."]
@@ -52,31 +51,139 @@ script = ExtResource("3_bua5r")
 base_string = "Shafts: "
 stat_name = "shaft_count"
 
-[node name="InteractionMenu" type="Panel" parent="."]
+[node name="Panel3" type="Panel" parent="."]
+layout_mode = 1
+offset_right = 320.0
+offset_bottom = 250.0
+size_flags_vertical = 3
+
+[node name="Control" type="VBoxContainer" parent="Panel3"]
+layout_mode = 1
+offset_right = 205.0
+offset_bottom = 35.0
+
+[node name="Top-Left Buttons" type="HBoxContainer" parent="Panel3/Control"]
+layout_mode = 2
+
+[node name="Restart Editor" type="Button" parent="Panel3/Control/Top-Left Buttons"]
+layout_mode = 2
+focus_mode = 0
+text = "Restart Editor"
+
+[node name="Go To Sim" type="Button" parent="Panel3/Control/Top-Left Buttons"]
+layout_mode = 2
+focus_mode = 0
+text = "Go To Sim"
+
+[node name="Save" type="Button" parent="Panel3/Control/Top-Left Buttons"]
+layout_mode = 2
+focus_mode = 0
+text = "Save"
+
+[node name="Load" type="Button" parent="Panel3/Control/Top-Left Buttons"]
+layout_mode = 2
+focus_mode = 0
+text = "Load"
+
+[node name="Controls Hints" type="VBoxContainer" parent="Panel3/Control"]
+layout_mode = 2
+script = ExtResource("2_mrnho")
+
+[node name="VBoxContainer2" type="VBoxContainer" parent="."]
+custom_minimum_size = Vector2(256, 0)
 layout_mode = 1
 anchors_preset = 11
 anchor_left = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = -244.0
+offset_left = -35.0
 grow_horizontal = 0
 grow_vertical = 2
 
-[node name="VBoxContainer" type="VBoxContainer" parent="InteractionMenu"]
+[node name="Panel" type="Panel" parent="VBoxContainer2"]
+custom_minimum_size = Vector2(0, 70)
+layout_mode = 2
+
+[node name="HFlowContainer" type="HFlowContainer" parent="VBoxContainer2/Panel"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 31.0
+grow_horizontal = 2
+
+[node name="Automove" parent="VBoxContainer2/Panel/HFlowContainer" instance=ExtResource("5_yhok4")]
+layout_mode = 2
+focus_mode = 0
+button_pressed = true
+text = "Automove"
+
+[node name="Select" parent="VBoxContainer2/Panel/HFlowContainer" instance=ExtResource("5_yhok4")]
+layout_mode = 2
+focus_mode = 0
+text = "Select"
+
+[node name="Copy" type="Button" parent="VBoxContainer2/Panel/HFlowContainer"]
+layout_mode = 2
+focus_mode = 0
+disabled = true
+text = "Copy"
+
+[node name="Cut" type="Button" parent="VBoxContainer2/Panel/HFlowContainer"]
+layout_mode = 2
+focus_mode = 0
+disabled = true
+text = "Cut"
+
+[node name="Paste" type="Button" parent="VBoxContainer2/Panel/HFlowContainer"]
+layout_mode = 2
+focus_mode = 0
+text = "Paste"
+
+[node name="InteractionMenu" type="Panel" parent="VBoxContainer2"]
+visible = false
+layout_mode = 2
+size_flags_vertical = 3
+focus_mode = 1
+
+[node name="VBoxContainer" type="VBoxContainer" parent="VBoxContainer2/InteractionMenu"]
 layout_mode = 1
 anchors_preset = 10
 anchor_right = 1.0
 grow_horizontal = 2
 
-[node name="Label" type="Label" parent="InteractionMenu/VBoxContainer"]
+[node name="Label" type="Label" parent="VBoxContainer2/InteractionMenu/VBoxContainer"]
 layout_mode = 2
 text = "Block Parameters"
 
-[node name="HSeparator" type="HSeparator" parent="InteractionMenu/VBoxContainer"]
+[node name="HSeparator" type="HSeparator" parent="VBoxContainer2/InteractionMenu/VBoxContainer"]
 layout_mode = 2
 
-[node name="VBoxContainer" type="VBoxContainer" parent="InteractionMenu/VBoxContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="VBoxContainer2/InteractionMenu/VBoxContainer"]
 layout_mode = 2
 
-[connection signal="pressed" from="Top-Left Buttons/Restart Editor" to="." method="_on_reload_pressed"]
-[connection signal="pressed" from="Top-Left Buttons/Go To Sim" to="." method="_on_to_sim_pressed"]
+[node name="FileDialog" type="FileDialog" parent="."]
+title = "Open a File"
+initial_position = 1
+size = Vector2i(517, 777)
+ok_button_text = "Open"
+file_mode = 0
+access = 1
+
+[node name="Toolbar" parent="." instance=ExtResource("6_hl5rt")]
+layout_mode = 1
+offset_left = -522.5
+offset_right = 522.5
+
+[connection signal="pressed" from="Panel3/Control/Top-Left Buttons/Restart Editor" to="." method="_on_reload_pressed"]
+[connection signal="pressed" from="Panel3/Control/Top-Left Buttons/Go To Sim" to="." method="_on_to_sim_pressed"]
+[connection signal="pressed" from="Panel3/Control/Top-Left Buttons/Save" to="." method="_on_save_pressed"]
+[connection signal="pressed" from="Panel3/Control/Top-Left Buttons/Load" to="." method="_on_load_pressed"]
+[connection signal="toggled" from="VBoxContainer2/Panel/HFlowContainer/Automove" to="." method="_on_automove_toggled"]
+[connection signal="toggled" from="VBoxContainer2/Panel/HFlowContainer/Select" to="." method="_on_select_toggled"]
+[connection signal="pressed" from="VBoxContainer2/Panel/HFlowContainer/Copy" to="." method="_on_copy_pressed"]
+[connection signal="pressed" from="VBoxContainer2/Panel/HFlowContainer/Cut" to="." method="_on_cut_pressed"]
+[connection signal="pressed" from="VBoxContainer2/Panel/HFlowContainer/Paste" to="." method="_on_paste_pressed"]
+[connection signal="file_selected" from="FileDialog" to="." method="_on_file_dialog_file_selected"]
+[connection signal="selected_string" from="Toolbar/HBoxContainer" to="." method="_on_toolbar_selected_string"]
+
+[editable path="Toolbar"]

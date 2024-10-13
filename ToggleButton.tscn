@@ -1,0 +1,22 @@
+[gd_scene load_steps=2 format=3 uid="uid://y1r6djf2dq37"]
+
+[ext_resource type="Script" path="res://ToggleButton.gd" id="1_igeh0"]
+
+[node name="Button" type="Button"]
+toggle_mode = true
+text = "foo"
+flat = true
+
+[node name="ColorRect" type="ColorRect" parent="."]
+show_behind_parent = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0.27451, 0.666667, 1)
+script = ExtResource("1_igeh0")
+
+[connection signal="pressed" from="." to="ColorRect" method="_on_button_pressed"]

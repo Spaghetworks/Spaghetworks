@@ -9,8 +9,9 @@
 	},
 	"collision_mesh":
 	{
-		"name":"generator_cuboid",
-		"dimensions":[3,1,3]
+		"name":"generator_cylinder",
+		"diameter": 3,
+		"height": 1
 	},
 	"modules":
 	[
