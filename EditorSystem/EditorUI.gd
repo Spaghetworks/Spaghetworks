@@ -11,11 +11,38 @@ var statemachine
 @onready var interaction_list = $VBoxContainer2/InteractionMenu/VBoxContainer/VBoxContainer
 @onready var file_dialog = $FileDialog
 @onready var palette = $Palette
+@onready var toolbar = $Toolbar/HBoxContainer
+@onready var block_loader = $"/root/BlockLoader"
 const construct_dir = "user://Constructs"
+const editor_settings_file = "user://editor_settings.json"
 var file_dialog_init = false
 
 func _ready():
 	statemachine = get_node("/root/SceneStateMachine")
+	if FileAccess.file_exists(editor_settings_file):
+		# Apply settings from file
+		var settings_file = FileAccess.open(editor_settings_file, FileAccess.READ)
+		var settings = JSON.parse_string(settings_file.get_as_text())
+		# Toolbar
+		if settings.has("toolbar"):
+			var index = 0
+			for element in settings["toolbar"]:
+				# Validate block name
+				if block_loader.blocks.has(element):
+					# Add block name to toolbar
+					toolbar.set_label(index, block_loader.blocks[element].get_meta("display_name"), element)
+				index += 1
+
+func _exit_tree():
+	# Save settings to file
+	var settings = {}
+	# Toolbar
+	settings["toolbar"] = []
+	for element in toolbar.button_strings:
+		settings["toolbar"].append(element)
+	
+	var settings_file = FileAccess.open(editor_settings_file, FileAccess.WRITE)
+	settings_file.store_line(JSON.stringify(settings, "  "))
 
 func _unhandled_input(_event):
 	if Input.is_action_just_pressed("EditorPalette"):

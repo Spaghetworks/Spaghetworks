@@ -24,7 +24,6 @@ func _on_button_pressed():
 # Droppable data must be a dictionary with a valid "type" key
 
 func _can_drop_data(_at_position, data):
-	print("drop queried")
 	if data is Dictionary && data.has("type"):
 		if data["type"] == "block":
 			return true

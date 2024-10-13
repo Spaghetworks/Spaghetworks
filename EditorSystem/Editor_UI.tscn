@@ -169,7 +169,7 @@ ok_button_text = "Open"
 file_mode = 0
 access = 1
 
-[node name="Control" parent="." instance=ExtResource("6_hl5rt")]
+[node name="Toolbar" parent="." instance=ExtResource("6_hl5rt")]
 layout_mode = 1
 offset_left = -522.5
 offset_right = 522.5
@@ -184,6 +184,6 @@ offset_right = 522.5
 [connection signal="pressed" from="VBoxContainer2/Panel/HFlowContainer/Cut" to="." method="_on_cut_pressed"]
 [connection signal="pressed" from="VBoxContainer2/Panel/HFlowContainer/Paste" to="." method="_on_paste_pressed"]
 [connection signal="file_selected" from="FileDialog" to="." method="_on_file_dialog_file_selected"]
-[connection signal="selected_string" from="Control/HBoxContainer" to="." method="_on_toolbar_selected_string"]
+[connection signal="selected_string" from="Toolbar/HBoxContainer" to="." method="_on_toolbar_selected_string"]
 
-[editable path="Control"]
+[editable path="Toolbar"]
