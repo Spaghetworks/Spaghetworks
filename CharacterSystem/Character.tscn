@@ -1,10 +1,11 @@
-[gd_scene load_steps=8 format=3 uid="uid://dc22xe8nqjrxt"]
+[gd_scene load_steps=9 format=3 uid="uid://dc22xe8nqjrxt"]
 
 [ext_resource type="Script" path="res://CharacterSystem/CharacterController.gd" id="1_b7ton"]
 [ext_resource type="Texture2D" uid="uid://dwj2g6eq8023n" path="res://OrthoCross.png" id="2_0rt46"]
 [ext_resource type="Script" path="res://Toolbelt.gd" id="2_ewbx6"]
 [ext_resource type="PackedScene" uid="uid://brv5gql2tf83r" path="res://Impulse_Tool.tscn" id="3_2xrat"]
 [ext_resource type="Script" path="res://CenteredSprite.gd" id="3_o6yyv"]
+[ext_resource type="Script" path="res://CharacterSystem/InteractionRaycast.gd" id="4_jndq5"]
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_cuyvo"]
 radius = 0.4
@@ -13,6 +14,7 @@ radius = 0.4
 radius = 0.3
 
 [node name="CharacterOrigin" type="CharacterBody3D"]
+collision_layer = 0
 script = ExtResource("1_b7ton")
 
 [node name="BodyShape" type="CollisionShape3D" parent="."]
@@ -33,8 +35,15 @@ position = Vector2(1280, 720)
 texture = ExtResource("2_0rt46")
 script = ExtResource("3_o6yyv")
 
+[node name="InteractionRaycast" type="RayCast3D" parent="HeadShape/Camera3D"]
+target_position = Vector3(0, 0, -2)
+collision_mask = 3
+collide_with_areas = true
+script = ExtResource("4_jndq5")
+
 [node name="HeadDriver" type="RigidBody3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.45, 0)
+collision_layer = 0
 mass = 0.1
 can_sleep = false
 linear_damp = 0.01
