@@ -1,4 +1,5 @@
 extends Area3D
+class_name InteractionArea
 
 signal interacted
 

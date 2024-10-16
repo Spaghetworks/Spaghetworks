@@ -1,0 +1,21 @@
+[remap]
+
+importer="wavefront_obj"
+importer_version=1
+type="Mesh"
+uid="uid://cxt4osog8a3ke"
+path="res://.godot/imported/rocker_switch.obj-2d92d1684b577af4054ef343c7d52eee.mesh"
+
+[deps]
+
+files=["res://.godot/imported/rocker_switch.obj-2d92d1684b577af4054ef343c7d52eee.mesh"]
+
+source_file="res://BlockSystem/Blocks/Interaction/rocker_switch.obj"
+dest_files=["res://.godot/imported/rocker_switch.obj-2d92d1684b577af4054ef343c7d52eee.mesh", "res://.godot/imported/rocker_switch.obj-2d92d1684b577af4054ef343c7d52eee.mesh"]
+
+[params]
+
+generate_tangents=true
+scale_mesh=Vector3(1, 1, 1)
+offset_mesh=Vector3(0, 0, 0)
+optimize_mesh=true

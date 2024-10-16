@@ -6,5 +6,4 @@ func _unhandled_input(event):
 			return
 		var collided = get_collider()
 		if collided is Area3D:
-			print("Interaction hit ", collided)
 			collided.interact()

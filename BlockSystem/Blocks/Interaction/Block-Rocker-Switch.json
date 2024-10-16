@@ -1,0 +1,50 @@
+{
+	"name":"interaction_rocker_switch",
+	"display_name":"Rocker Switch",
+	"category":"Interaction",
+	"mass":1,
+	"visual_mesh":
+	{
+		"name":"generator_cuboid",
+		"dimensions":[1,1,1]
+	},
+	"collision_mesh":
+	{
+		"name":"generator_cuboid",
+		"dimensions":[1,1,1]
+	},
+	"modules":
+	[
+		{
+			"name":"Interaction/InteractionAreaToggle",
+			"params":
+			{
+				"area_name":"button",
+				"dimensions":[1,0.9,0.9],
+				"offset":[0.01,0,0]
+			}
+		},
+		{
+			"name":"Interaction/ToggleMesh",
+			"params":
+			{
+				"mesh_name":"Blocks/Interaction/rocker_switch.obj",
+				"source_area":"button",
+				"true_transform":
+				{
+					"origin": [0.048,0,0],
+					"x": [0.990,0,-0.139],
+					"y": [0    ,1, 0    ],
+					"z": [0.139,0, 0.990]
+				},
+				"false_transform":
+				{
+					"origin": [0.048,0,0],
+					"x": [ 0.990,0,0.139],
+					"y": [ 0    ,1,0    ],
+					"z": [-0.139,0,0.990]
+				}
+			}
+		}
+	]
+}
