@@ -45,6 +45,44 @@
 					"z": [-0.139,0,0.990]
 				}
 			}
+		},
+		{
+			"name":"Logic/LogicInputListener",
+			"params":
+			{
+				"listener_name":"button_listener",
+				"type":"bool",
+				"source_name":"button",
+				"source_signal":"interacted",
+				"interface_name":"button_interface",
+				"channel_number":0
+			}
+		},
+		{
+			"name":"Logic/LogicInterface",
+			"params":
+			{
+				"interface_name":"button_interface"
+			}
+		},
+		{
+			"name":"Logic/LogicOutputListener",
+			"params":
+			{
+				"listener_name":"button_output",
+				"type":"bool",
+				"target_name":"button_debug",
+				"target_func_name":"debug",
+				"interface_name":"button_interface",
+				"channel_number":0
+			}
+		},
+		{
+			"name":"Logic/LogicDebug",
+			"params":
+			{
+				"debug_name":"button_debug"
+			}
 		}
 	]
 }
