@@ -9,6 +9,7 @@ extends Node
 var element_a
 var element_b
 var ui
+var enabled = true
 
 func initialize(params):
 	name = params["constraint_name"]
@@ -42,6 +43,12 @@ func _on_constraint_velocity_changed(text):
 func _on_breaking_force_changed(text):
 	print(text)
 	breaking_force = float(text)
+
+func set_enabled(enable):
+	enabled = enable
+
+func get_breaking_force():
+	return breaking_force if enabled else 0.0
 
 func assemble_ui():
 	ui = VBoxContainer.new()

@@ -27,9 +27,11 @@ func initialize(params):
 	channel_number = params["channel_number"]
 
 func _enter_tree():
-	target = get_node("../" + target_name)
+	if target == null:
+		target = get_node("../" + target_name)
+	if interface == null:
+		interface = get_node("../" + interface_name)
 	target_func = Callable(target, target_func_name)
-	interface = get_node("../" + interface_name)
 	interface.add_output(channel_number, self)
 
 func _exit_tree():

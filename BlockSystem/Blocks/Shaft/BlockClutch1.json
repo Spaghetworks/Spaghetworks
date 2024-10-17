@@ -1,0 +1,136 @@
+{
+	"name":"block_clutch_1",
+	"display_name":"Clutch 1",
+	"category":"Shaft Power",
+	"mass":0.78,
+	"visual_mesh":"Blocks/Shaft/block_spring_1_3.obj",
+	"collision_mesh":
+	{
+		"name":"generator_cylinder",
+		"diameter": 3,
+		"height": 3
+	},
+	"modules":
+	[
+		{
+			"name":"Interaction/InteractionAreaToggle",
+			"params":
+			{
+				"area_name":"button",
+				"dimensions":[1,0.9,0.9],
+				"offset":[0.11,0,0]
+			}
+		},
+
+		{
+			"name":"Interaction/ToggleMesh",
+			"params":
+			{
+				"mesh_name":"Blocks/Interaction/rocker_switch.obj",
+				"source_area":"button",
+				"true_transform":
+				{
+					"origin": [0.148,0,0],
+					"x": [0.990,-0.139, 0],
+					"y": [0    , 0    ,-1],
+					"z": [0.139, 0.990, 0]
+				},
+				"false_transform":
+				{
+					"origin": [0.148,0,0],
+					"x": [ 0.990,0.139, 0],
+					"y": [ 0    ,0    ,-1],
+					"z": [-0.139,0.990, 0]
+				}
+			}
+		},
+
+		{
+			"name":"Logic/LogicInputListener",
+			"params":
+			{
+				"listener_name":"button_listener",
+				"type":"bool",
+				"source_name":"button",
+				"source_signal":"interacted",
+				"interface_name":"button_interface",
+				"channel_number":0
+			}
+		},
+
+		{
+			"name":"Logic/LogicInterface",
+			"params":
+			{
+				"interface_name":"button_interface"
+			}
+		},
+
+		{
+			"name":"Logic/LogicOutputListener",
+			"params":
+			{
+				"listener_name":"button_output",
+				"type":"bool",
+				"target_name":"clutch",
+				"target_func_name":"set_enabled",
+				"interface_name":"button_interface",
+				"channel_number":0
+			}
+		},
+
+		{
+			"name":"Socket",
+			"params":
+			{
+				"socket_name":"socket_end_a",
+				"socket_type":"shaft_1",
+				"position":[0.0,0.15,0.0]
+			}
+		},
+
+		{
+			"name":"Socket",
+			"params":
+			{
+				"socket_name":"socket_end_b",
+				"socket_type":"shaft_1",
+				"position":[0.0,-0.15,0.0]
+			}
+		},
+
+		{
+			"name":"Shaft/ShaftElement",
+			"params":
+			{
+				"element_name":"shaft_a",
+				"moment":975E-6,
+				"sockets":["socket_end_a"],
+				"axis":[0,1,0]
+			}
+		},
+
+		{
+			"name":"Shaft/ShaftElement",
+			"params":
+			{
+				"element_name":"shaft_b",
+				"moment":975E-6,
+				"sockets":["socket_end_b"],
+				"axis":[0,1,0]
+			}
+		},
+
+		{
+			"name":"Shaft/ShaftConstraint",
+			"params":
+			{
+				"type":"proportional",
+				"ratio": [1,1],
+				"breaking_force":10000.0,
+				"constraint_name":"clutch",
+				"elements":["shaft_a","shaft_b"]
+			}
+		},
+	]
+}

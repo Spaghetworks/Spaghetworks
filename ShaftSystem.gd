@@ -135,10 +135,10 @@ func step(delta):
 						continue
 					match constraint.type:
 						"proportional":
-							if abs(x_vec[index]) > constraint.breaking_force:
+							if abs(x_vec[index]) > constraint.get_breaking_force():
 								elided.append(index)
 								broken = true
-								x_vec[index] = clamp(x_vec[index], -constraint.breaking_force, constraint.breaking_force)
+								x_vec[index] = clamp(x_vec[index], -constraint.get_breaking_force(), constraint.get_breaking_force())
 								constraint.element_a.add_torque( x_vec[index] * constraint.ratio[0])
 								constraint.element_b.add_torque(-x_vec[index] * constraint.ratio[1])
 					index += 1
@@ -168,7 +168,7 @@ func step(delta):
 			for constraint in constraints:
 				match constraint.type:
 					"proportional":
-						if abs(x_vec[index]) > constraint.breaking_force:
+						if abs(x_vec[index]) > constraint.get_breaking_force():
 							print("Excess force!")
 							print(index, " ", x_vec[index])
 						constraint.element_a.add_torque( x_vec[index] * constraint.ratio[0])

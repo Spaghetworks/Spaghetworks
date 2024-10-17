@@ -27,6 +27,7 @@ func add_input(input):
 		print("Attempted to add input of incompatible type")
 
 func remove_input(input):
+	input.updated.disconnect(on_input_updated)
 	inputs.erase(input)
 
 func add_output(output):
@@ -37,6 +38,7 @@ func add_output(output):
 		print("Attempted to add output of incompatible type")
 
 func remove_output(output):
+	value_updated.disconnect(output.on_value_updated)
 	outputs.erase(output)
 
 func on_input_updated(packet = null):
