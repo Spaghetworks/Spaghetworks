@@ -3,3 +3,6 @@
 
 # Rust build targets
 rust/target
+
+# VS Code stuff
+.vscode
