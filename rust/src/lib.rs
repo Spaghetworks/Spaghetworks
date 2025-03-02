@@ -7,3 +7,5 @@ unsafe impl ExtensionLibrary for MyExtension {}
 
 mod matrixsolver;
 pub use matrixsolver::MatrixSolver;
+
+pub mod physics_units;
