@@ -1,5 +1,9 @@
 use super::tank_shape::TankShape;
-use crate::physics_units::Length;
+use crate::{
+    fluid::fluid_prototype::Fluid,
+    physics_units::{Length, Volume},
+};
+// use std::marker::PhantomData;
 
 #[derive(Clone, Copy, PartialEq)]
 struct UnknownFluidTankElevation {
@@ -27,8 +31,16 @@ pub(crate) struct SimpleFluidTankBuilder {
 #[derive(Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub(crate) struct SimpleFluidTankIdentifier(usize);
 
-pub(crate) struct SimpleFluidTank;
-pub(crate) struct FluidTank;
+pub(crate) struct SimpleFluidTank {
+    downlinks: Vec<SimpleFluidTankIdentifier>,
+    shape: Box<dyn TankShape>, // TODO: Switch to using &'owner dyn TankShape
+    elevation: Length,
+    fluids: Vec<Fluid>, // _phantom: PhantomData<&'owner dyn TankShape>,
+} // TODO
+pub(crate) struct FluidTank {
+    simple_fluid_tanks: Vec<SimpleFluidTank>,
+    // shapes: Bump // Container that owns all the &dyn TankShape objects
+} // TODO
 
 impl SimpleFluidTankIdentifier {
     fn increment(&mut self) {
@@ -93,20 +105,6 @@ impl std::ops::Sub<Length> for UnknownFluidTankElevation {
     }
 }
 
-// TODO: Below is old code to be inspected for useful stuff then removed
-
-pub(crate) enum FluidTankFinalizeError {
-    NotOrdered,
-    UninitializedSimpleFluidTank,
-}
-
-#[derive(PartialEq, Eq, Hash)]
-enum DfsBookkeepingState {
-    Unvisited,
-    Pending,
-    Finalized,
-}
-
 impl FluidTankBuilder {
     pub(crate) fn new() -> Self {
         Self {
@@ -149,6 +147,7 @@ impl FluidTankBuilder {
         self.add_link(id, target);
         id
     }
+
     pub(crate) fn add_link(
         &mut self,
         above: SimpleFluidTankIdentifier,
@@ -178,7 +177,86 @@ impl FluidTankBuilder {
         Ok(())
     }
 
-    pub(crate) fn finalize(self) -> FluidTank {
+    pub(crate) fn finalize(self) -> Result<FluidTank, Self> {
+        for x in &self.simple_fluid_tanks {
+            if x.elevation.unknown_id != 0 {
+                return Err(self);
+            }
+        }
+        let tanks: Vec<_> = self
+            .simple_fluid_tanks
+            .into_iter()
+            .map(|simple_fluid_tank_builder| SimpleFluidTank {
+                downlinks: simple_fluid_tank_builder.downlinks,
+                elevation: simple_fluid_tank_builder.elevation.height,
+                shape: simple_fluid_tank_builder.shape,
+                fluids: Vec::new(),
+            })
+            .collect();
+        Ok(FluidTank {
+            simple_fluid_tanks: tanks,
+        })
+    }
+}
+
+impl FluidTank {
+    pub(crate) fn add_fluid_to(&mut self, fluid: Fluid, tank: SimpleFluidTankIdentifier) {
         todo!()
+    }
+}
+
+impl SimpleFluidTank {
+    fn add_fluid(&mut self, fluid: Fluid) {
+        let mut index = None;
+        // Merge fluid if it already exists
+        for (idx, own_fluid) in self.fluids.iter_mut().enumerate() {
+            if own_fluid.prototype == fluid.prototype {
+                own_fluid.volume += fluid.volume;
+                return;
+            } else if own_fluid.prototype.bind().density < fluid.prototype.bind().density {
+                index = Some(idx);
+                break;
+            }
+        }
+        // Insertion sort, but like only one iteration
+        let index = index.unwrap_or(self.fluids.len());
+        self.fluids.insert(index, fluid);
+    }
+    fn get_fill_volume(&self) -> Volume {
+        let volume = self.fluids.iter().map(|fluid| fluid.volume).sum();
+
+        volume
+    }
+    /// Err indicates that the tank is over-full
+    fn get_fill_height(&self) -> Option<Length> {
+        self.shape.get_depth_from_volume(self.get_fill_volume())
+    }
+
+    fn is_overflowing(&self) -> bool {
+        self.get_fill_volume() > self.shape.get_full_volume()
+    }
+
+    fn pop_overflowing_fluid(&mut self) -> Option<Fluid> {
+        let overflow_volume = self.get_fill_volume() - self.shape.get_full_volume();
+
+        if overflow_volume > Volume::from(0.0) {
+            if {
+                let top_fluid = self
+                    .fluids
+                    .last()
+                    .expect("Overflowing, so there must be at least one fluid");
+                top_fluid.volume > overflow_volume
+            } {
+                self.fluids
+                    .last_mut()
+                    .expect("We checked earlier")
+                    .split_off(overflow_volume)
+                    .ok()
+            } else {
+                self.fluids.pop()
+            }
+        } else {
+            None
+        }
     }
 }
