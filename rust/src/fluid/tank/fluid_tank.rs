@@ -33,6 +33,7 @@ pub(crate) struct SimpleFluidTankIdentifier(usize);
 
 pub(crate) struct SimpleFluidTank {
     downlinks: Vec<SimpleFluidTankIdentifier>,
+    uplinks: Vec<SimpleFluidTankIdentifier>,
     shape: Box<dyn TankShape>, // TODO: Switch to using &'owner dyn TankShape
     elevation: Length,
     fluids: Vec<Fluid>, // _phantom: PhantomData<&'owner dyn TankShape>,
@@ -183,16 +184,26 @@ impl FluidTankBuilder {
                 return Err(self);
             }
         }
-        let tanks: Vec<_> = self
+        let mut tanks: Vec<_> = self
             .simple_fluid_tanks
             .into_iter()
             .map(|simple_fluid_tank_builder| SimpleFluidTank {
                 downlinks: simple_fluid_tank_builder.downlinks,
+                uplinks: Vec::new(),
                 elevation: simple_fluid_tank_builder.elevation.height,
                 shape: simple_fluid_tank_builder.shape,
                 fluids: Vec::new(),
             })
             .collect();
+        for tank_idx in 0..tanks.len() {
+            for downlink_idx in 0..(tanks[tank_idx].downlinks.len()) {
+                let downlink = tanks[tank_idx].downlinks[downlink_idx];
+                tanks[downlink.0]
+                    .uplinks
+                    .push(SimpleFluidTankIdentifier(tank_idx));
+            }
+        }
+
         Ok(FluidTank {
             simple_fluid_tanks: tanks,
         })
