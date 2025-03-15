@@ -40,6 +40,15 @@ macro_rules! wrapper_addition_group {
                 self
             }
         }
+        impl std::iter::Sum for $type {
+            fn sum<I>(iter: I) -> Self where I: Iterator<Item = Self> {
+                let mut sum = <$type as From<f64>>::from(0.0);
+                for x in iter {
+                    sum += x;
+                }
+                sum
+            }
+        }
         impl std::ops::Neg for $type {
             type Output = Self;
             fn neg(self) -> Self::Output {
