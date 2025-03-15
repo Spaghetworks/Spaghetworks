@@ -44,3 +44,46 @@ impl TankShape for PrismTankShape {
         }
     }
 }
+pub(crate) struct StackedTankShape {
+    // A list of tank shapes, from bottom to top
+    stack: Vec<Box<dyn TankShape>>,
+}
+
+impl TankShape for StackedTankShape {
+    fn get_full_depth(&self) -> Length {
+        self.stack.iter().map(|shape| shape.get_full_depth()).sum()
+    }
+    fn get_full_volume(&self) -> Volume {
+        self.stack.iter().map(|shape| shape.get_full_volume()).sum()
+    }
+
+    fn get_depth_from_volume(&self, mut volume: Volume) -> Option<Length> {
+        let mut cumulative_depth = Length::from(0.0);
+        for shape in self.stack.iter() {
+            if shape.get_full_volume() > volume {
+                return shape
+                    .get_depth_from_volume(volume)
+                    .map(|depth| depth + cumulative_depth);
+            } else {
+                volume -= shape.get_full_volume();
+                cumulative_depth += shape.get_full_depth();
+            }
+        }
+        None
+    }
+
+    fn get_volume_from_depth(&self, mut depth: Length) -> Option<Volume> {
+        let mut cumulative_volume = Volume::from(0.0);
+        for shape in self.stack.iter() {
+            if shape.get_full_depth() > depth {
+                return shape
+                    .get_volume_from_depth(depth)
+                    .map(|volume| volume + cumulative_volume);
+            } else {
+                depth -= shape.get_full_depth();
+                cumulative_volume += shape.get_full_volume();
+            }
+        }
+        None
+    }
+}
